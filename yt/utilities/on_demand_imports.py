@@ -460,3 +460,30 @@ class libconf_imports(object):
         return self._load
 
 _libconf = libconf_imports()
+
+class yaml_imports(object):
+    _name = "yaml"
+    _load = None
+    _FullLoader = None
+
+    @property
+    def load(self):
+        if self._load is None:
+            try:
+                from yaml import load
+            except ImportError:
+                load = NotAModule(self._name)
+            self._load = load
+        return self._load
+
+    @property
+    def FullLoader(self):
+        if self._FullLoader is None:
+            try:
+                from yaml import FullLoader
+            except ImportError:
+                FullLoader = NotAModule(self._name)
+            self._FullLoader = FullLoader
+        return self._FullLoader
+
+_yaml = yaml_imports()

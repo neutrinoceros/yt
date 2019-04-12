@@ -29,9 +29,12 @@ from six.moves import cPickle
 from yt.config import ytcfg
 from yt.fields.derived_field import \
     DerivedField
+from yt.fields.field_type_container import \
+    FieldTypeContainer
 from yt.funcs import \
     mylog, \
     set_intersection, \
+    setdefaultattr, \
     ensure_list
 from yt.utilities.cosmology import \
     Cosmology
@@ -66,7 +69,8 @@ from yt.utilities.minimal_representation import \
     MinimalDataset
 from yt.units.yt_array import \
     YTArray, \
-    YTQuantity
+    YTQuantity, \
+    _wrap_display_ytarray
 from yt.units.unit_systems import \
     create_code_unit_system, \
     _make_unit_system_copy
@@ -100,80 +104,6 @@ class RegisteredDataset(type):
         output_type_registry[name] = cls
         mylog.debug("Registering: %s as %s", name, cls)
 
-class FieldTypeContainer(object):
-    def __init__(self, ds):
-        self.ds = weakref.proxy(ds)
-
-    def __getattr__(self, attr):
-        ds = self.__getattribute__('ds')
-        fnc = FieldNameContainer(ds, attr)
-        if len(dir(fnc)) == 0:
-            return self.__getattribute__(attr)
-        return fnc
-
-    _field_types = None
-    @property
-    def field_types(self):
-        if self._field_types is None:
-            self._field_types = set(t for t, n in self.ds.field_info)
-        return self._field_types
-
-    def __dir__(self):
-        return list(self.field_types)
-
-    def __iter__(self):
-        for ft in self.field_types:
-            fnc = FieldNameContainer(self.ds, ft)
-            if len(dir(fnc)) == 0:
-                yield self.__getattribute__(ft)
-            else:
-                yield fnc
-
-    def __contains__(self, obj):
-        ob = None
-        if isinstance(obj, FieldNameContainer):
-            ob = obj.field_type
-        elif isinstance(obj, string_types):
-            ob = obj
-
-        return ob in self.field_types
-
-class FieldNameContainer(object):
-    def __init__(self, ds, field_type):
-        self.ds = ds
-        self.field_type = field_type
-
-    def __getattr__(self, attr):
-        ft = self.__getattribute__("field_type")
-        ds = self.__getattribute__("ds")
-        if (ft, attr) not in ds.field_info:
-            return self.__getattribute__(attr)
-        return ds.field_info[ft, attr]
-
-    def __dir__(self):
-        return [n for t, n in self.ds.field_info
-                if t == self.field_type]
-
-    def __iter__(self):
-        for t, n in self.ds.field_info:
-            if t == self.field_type:
-                yield self.ds.field_info[t, n]
-
-    def __contains__(self, obj):
-        if isinstance(obj, DerivedField):
-            if self.field_type == obj.name[0] and obj.name in self.ds.field_info:
-                # e.g. from a completely different dataset
-                if self.ds.field_info[obj.name] is not obj:
-                    return False
-                return True
-        elif isinstance(obj, tuple):
-            if self.field_type == obj[0] and obj in self.ds.field_info:
-                return True
-        elif isinstance(obj, string_types):
-            if (self.field_type, obj) in self.ds.field_info:
-                return True
-        return False
-
 class IndexProxy(object):
     # This is a simple proxy for Index objects.  It enables backwards
     # compatibility so that operations like .h.sphere, .h.print_stats and
@@ -194,8 +124,9 @@ class IndexProxy(object):
 
 class MutableAttribute(object):
     """A descriptor for mutable data"""
-    def __init__(self):
+    def __init__(self, display_array = False):
         self.data = weakref.WeakKeyDictionary()
+        self.display_array = display_array
 
     def __get__(self, instance, owner):
         if not instance:
@@ -205,6 +136,14 @@ class MutableAttribute(object):
             ret = ret.copy()
         except AttributeError:
             pass
+        if self.display_array:
+            try:
+                setattr(ret, "_ipython_display_",
+                        functools.partial(_wrap_display_ytarray, ret))
+            # This will error out if the items have yet to be turned into
+            # YTArrays, in which case we just let it go.
+            except AttributeError:
+                pass
         return ret
 
     def __set__(self, instance, value):
@@ -338,6 +277,8 @@ class Dataset(object):
             n = "domain_%s" % attr
             v = getattr(self, n)
             if not isinstance(v, YTArray):
+                # Note that we don't add on _ipython_display_ here because
+                # everything is stored inside a MutableAttribute.
                 v = self.arr(v, "code_length")
                 setattr(self, n, v)
 
@@ -400,11 +341,11 @@ class Dataset(object):
             self._checksum = m
         return self._checksum
 
-    domain_left_edge = MutableAttribute()
-    domain_right_edge = MutableAttribute()
-    domain_width = MutableAttribute()
-    domain_dimensions = MutableAttribute()
-    domain_center = MutableAttribute()
+    domain_left_edge = MutableAttribute(True)
+    domain_right_edge = MutableAttribute(True)
+    domain_width = MutableAttribute(True)
+    domain_dimensions = MutableAttribute(False)
+    domain_center = MutableAttribute(True)
 
     @property
     def _mrep(self):
@@ -535,7 +476,7 @@ class Dataset(object):
         if hasattr(self, "cosmological_simulation") and \
            getattr(self, "cosmological_simulation"):
             for a in ["current_redshift", "omega_lambda", "omega_matter",
-                      "hubble_constant"]:
+                      "omega_radiation", "hubble_constant"]:
                 if not hasattr(self, a):
                     mylog.error("Missing %s in parameter file definition!", a)
                     continue
@@ -824,9 +765,9 @@ class Dataset(object):
         source = self.all_data()
         max_val, mx, my, mz = \
             source.quantities.max_location(field)
-        mylog.info("Max Value is %0.5e at %0.16f %0.16f %0.16f",
-              max_val, mx, my, mz)
         center = self.arr([mx, my, mz], dtype="float64").to('code_length')
+        mylog.info("Max Value is %0.5e at %0.16f %0.16f %0.16f",
+              max_val, center[0], center[1], center[2])
         return max_val, center
 
     def find_min(self, field):
@@ -837,9 +778,9 @@ class Dataset(object):
         source = self.all_data()
         min_val, mx, my, mz = \
             source.quantities.min_location(field)
-        mylog.info("Min Value is %0.5e at %0.16f %0.16f %0.16f",
-              min_val, mx, my, mz)
         center = self.arr([mx, my, mz], dtype="float64").to('code_length')
+        mylog.info("Min Value is %0.5e at %0.16f %0.16f %0.16f",
+              min_val, center[0], center[1], center[2])
         return min_val, center
 
     def find_field_values_at_point(self, fields, coords):
@@ -1025,10 +966,14 @@ class Dataset(object):
             w_0 = getattr(self, 'w_0', -1.0)
             w_a = getattr(self, 'w_a', 0.0)
 
+            # many frontends do not set this
+            setdefaultattr(self, "omega_radiation", 0.0)
+
             self.cosmology = \
                     Cosmology(hubble_constant=self.hubble_constant,
                               omega_matter=self.omega_matter,
                               omega_lambda=self.omega_lambda,
+                              omega_radiation=self.omega_radiation,
                               use_dark_factor = use_dark_factor,
                               w_0 = w_0, w_a = w_a)
             self.critical_density = \
