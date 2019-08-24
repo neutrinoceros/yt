@@ -26,7 +26,7 @@ answer_tests:
   local_gadget_001:
     - yt/frontends/gadget/tests/test_outputs.py
 
-  local_gamer_004:
+  local_gamer_005:
     - yt/frontends/gamer/tests/test_outputs.py
 
   local_gdf_001:
@@ -85,7 +85,7 @@ answer_tests:
     - yt/visualization/volume_rendering/tests/test_mesh_render.py:test_wedge6_render
     - yt/visualization/volume_rendering/tests/test_mesh_render.py:test_wedge6_render_pyembree
 
-  local_boxlib_007:
+  local_boxlib_008:
     - yt/frontends/boxlib/tests/test_outputs.py:test_radadvect
     - yt/frontends/boxlib/tests/test_outputs.py:test_radtube
     - yt/frontends/boxlib/tests/test_outputs.py:test_star
