@@ -241,14 +241,13 @@ class AMRVACDataset(Dataset):
             unit_velocity = np.sqrt(unit_pressure / unit_density)
         # numberdensity, length and velocity defined in mod_usr.t file.
         else:
-            unit_pressure    = unit_density * unit_velocity**2
+            unit_pressure = unit_density * unit_velocity**2
             unit_temperature = unit_pressure / ((2.0 + 3.0*He_abundance) * unit_numberdensity * kB)
 
         unit_magneticfield = np.sqrt(mu0 * unit_pressure)
-        unit_time          = unit_length / unit_velocity
+        unit_time = unit_length / unit_velocity
 
-        # TOREVIEW @Niels: this seems really off, I don't think density and numberdensity share a unit
-        unit_mass          = unit_numberdensity * unit_length**3
+        unit_mass = unit_density * unit_length**3
 
 
         # Set unit attributes
