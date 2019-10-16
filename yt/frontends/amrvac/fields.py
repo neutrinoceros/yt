@@ -16,11 +16,14 @@ AMRVAC-specific fields
 from yt.fields.field_info_container import \
     FieldInfoContainer
 
+# We can define all of these like this, consistent with attributes in static_output.set_code_units().
+# All normalisations are already calculated correctly in data_structures._set_code_unit_attributes(),
+# and have been added as attributes there.
 code_density = "code_density"
-code_velocity = "code_length / code_time"
-code_momentum = "code_density * code_velocity / code_time"
+code_velocity = "code_velocity"
+code_momentum = "code_density * code_velocity"
 code_temperature = "code_temperature"
-code_pressure = "code_density * code_temperature"
+code_pressure = "code_pressure"
 code_energy = "code_specific_energy"
 code_magnetic = "code_magnetic"
 
@@ -61,6 +64,7 @@ class AMRVACFieldInfo(FieldInfoContainer):
                 ekin = ekin + 0.5 * data["amrvac", "m2"] ** 2 / data["amrvac", "rho"]
             if self.ds.dimensionality > 2:
                 ekin = ekin + 0.5 * data["amrvac", "m3"] ** 2 / data["amrvac", "rho"]
+            # override units, everything is normalised
             ekin.units = self.ds.unit_system['specific_energy']
             return ekin
 
@@ -90,21 +94,29 @@ class AMRVACFieldInfo(FieldInfoContainer):
             return pres
 
         def _temperature(field, data):
-            return data["amrvac", "pressure"] / data["amrvac", "rho"]
+            temp = data["amrvac", "pressure"] / data["amrvac", "rho"]
+            temp.units = self.ds.unit_system['temperature']
 
         def _velocity1(field, data):
-            return data["amrvac", "m1"] / data["amrvac", "rho"]
+            v1 = data["amrvac", "m1"] / data["amrvac", "rho"]
+            v1.units = self.ds.unit_system['velocity']
+            return v1
 
         def _velocity2(field, data):
-            return data["amrvac", "m2"] / data["amrvac", "rho"]
+            v2 = data["amrvac", "m2"] / data["amrvac", "rho"]
+            v2.units = self.ds.unit_system['velocity']
+            return v2
 
         def _velocity3(field, data):
-            return data["amrvac", "m3"] / data["amrvac", "rho"]
+            v3 = data["amrvac", "m3"] / data["amrvac", "rho"]
+            v3.units = self.ds.unit_system['velocity']
+            return v3
 
         def _total_energy(field, data):
             etot = _get_ekin(data)
             if ("amrvac", "b1") in self.field_list:
                 etot = etot + _get_emag(data)
+            etot.units = self.ds.unit_system['specific_energy']
             return etot
 
         # pressure field, add this first to calculate temperature after

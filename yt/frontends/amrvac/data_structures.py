@@ -249,6 +249,7 @@ class AMRVACDataset(Dataset):
 
         unit_mass = unit_density * unit_length**3
 
+        # TODO: define 'specific_energy_unit'
 
         # Set unit attributes
         if unit_system == "cgs":
