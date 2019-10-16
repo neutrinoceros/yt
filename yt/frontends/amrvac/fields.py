@@ -96,6 +96,7 @@ class AMRVACFieldInfo(FieldInfoContainer):
         def _temperature(field, data):
             temp = data["amrvac", "pressure"] / data["amrvac", "rho"]
             temp.units = self.ds.unit_system['temperature']
+            return temp
 
         def _velocity1(field, data):
             v1 = data["amrvac", "m1"] / data["amrvac", "rho"]
