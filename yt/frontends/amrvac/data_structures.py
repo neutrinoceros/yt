@@ -259,7 +259,7 @@ class AMRVACDataset(Dataset):
 
         # conversion constants
         He_abundance = 0.1  # hardcoded in AMRVAC
-        if self._usr_unit_system == 'si':
+        if self._usr_unit_system == 'mks':
             mp = mass_hydrogen_cgs.value * 1e-3
             kb = boltzmann_constant_cgs.value * 1e-7
             mu0 = mu_0.value
