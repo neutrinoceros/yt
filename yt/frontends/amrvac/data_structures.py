@@ -307,11 +307,11 @@ class AMRVACDataset(Dataset):
 
         unit_density = (1.0 + 4.0*He_abundance) * mp * unit_numberdensity
         if unit_velocity == 0:
-            unit_pressure = float((2.0 + 3.0*He_abundance) * unit_numberdensity * kb * unit_temperature)
-            unit_velocity = float(np.sqrt(unit_pressure / unit_density))
+            unit_pressure = (2.0 + 3.0*He_abundance) * unit_numberdensity * kb * unit_temperature
+            unit_velocity = np.sqrt(unit_pressure / unit_density)
         else:
-            unit_pressure = float(unit_density * unit_velocity**2)
-            unit_temperature = float(unit_pressure / ((2.0 + 3.0*He_abundance) * unit_numberdensity * kb))
+            unit_pressure = unit_density * unit_velocity**2
+            unit_temperature = unit_pressure / ((2.0 + 3.0*He_abundance) * unit_numberdensity * kb)
         unit_magneticfield = np.sqrt(mu0 * unit_pressure)
 
         # set units
