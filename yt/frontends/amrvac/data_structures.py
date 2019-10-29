@@ -29,6 +29,10 @@ from yt.funcs import \
     setdefaultattr
 from yt.data_objects.static_output import \
    Dataset
+from yt.utilities.physical_constants import \
+    mass_hydrogen_cgs, \
+    boltzmann_constant_cgs, \
+    mu_0
 
 from .fields import AMRVACFieldInfo
 from .datfile_utils import get_header, get_tree_info
@@ -129,8 +133,11 @@ class AMRVACDataset(Dataset):
     def __init__(self, filename, dataset_type='amrvac',
                 units_override=None, unit_system="cgs",
                 geometry_override=None):
+        # note: usr_unit_system is specific to this frontend
+        # Define unit_system supplied as argument to a separate attribute for usage in _set_code_unit_attributes().
+        # This is needed, as self.unit_system it not yet set when that method is called. Attribute is deleted after.
+        self._usr_unit_system = unit_system
         # note: geometry_override is specific to this frontend
-
         self._geometry_override = geometry_override
         super(AMRVACDataset, self).__init__(filename, dataset_type,
                                             units_override=units_override, unit_system=unit_system)
@@ -250,15 +257,90 @@ class AMRVACDataset(Dataset):
         # This is the reason why it uses setdefaultattr: it will only fill the gaps lefts by the "override",
         # instead of overriding them again
 
-        setdefaultattr(self, "length_unit", self.quan(1, "cm"))
-        setdefaultattr(self, "mass_unit", self.quan(1, "g"))
-        setdefaultattr(self, "time_unit", self.quan(1, "s"))
+        # conversion constants
+        He_abundance = 0.1  # hardcoded in AMRVAC
+        if self._usr_unit_system == 'si':
+            mp = mass_hydrogen_cgs.value * 1e-3
+            kb = boltzmann_constant_cgs.value * 1e-7
+            mu0 = mu_0.value
+        else:
+            mp = mass_hydrogen_cgs.value
+            kb = boltzmann_constant_cgs.value
+            mu0 = 4*np.pi
 
-        setdefaultattr(self, "velocity_unit", self.quan(self.length_unit/self.time_unit, "cm*s**-1"))
-        setdefaultattr(self, "density_unit", self.quan(self.mass_unit/self.length_unit**3, "g*cm**-3"))
-        setdefaultattr(self, "numberdensity_unit", self.quan(self.length_unit**-3, "cm**-3"))
+        # First check if overrides have been supplied, if that's the case use those instead.
+        # note: unit_length, unit_velocity and unit_temperature are passed to Dataset._override_code_units(), but
+        # unit_numberdensity is not. This is handled here, together with a similar mylog.info() message.
+        # Retrieve them from self.units_override as (val, unit) tuple to be consistent with YT.
+        if bool(self.units_override):
+            if self._usr_unit_system == 'mks':
+                unit_length = self.units_override.get('length_unit', (1, 'm'))
+                unit_numberdensity = self.units_override.get('numberdensity_unit', (1, 'm**-3'))
+                unit_velocity = self.units_override.get('velocity_unit', (0, 'm*s**-1'))
+            else:
+                unit_length = self.units_override.get('length_unit', (1, 'cm'))
+                unit_numberdensity = self.units_override.get('numberdensity_unit', (1, 'cm**-3'))
+                unit_velocity = self.units_override.get('velocity_unit', (0, 'cm*s**-1'))
+            unit_temperature = self.units_override.get('temperature_unit', (1, 'K'))
 
-        # TODO: check this
-        setdefaultattr(self, "temperature_unit", self.quan(1, "K"))
-        setdefaultattr(self, "pressure_unit", self.quan(1, "dyn*cm**-2"))
-        setdefaultattr(self, "magnetic_unit", self.quan(1, "gauss"))
+            mylog.info('Overriding numberdensity_unit: {:1.0e} {}.'.format(unit_numberdensity[0], unit_numberdensity[1]))
+            # use only values to calculate normalisations, units are handled afterwards
+            unit_length = unit_length[0]
+            unit_numberdensity = unit_numberdensity[0]
+            unit_velocity = unit_velocity[0]
+            unit_temperature = unit_temperature[0]
+        else:
+            # Next, check for unit normalisations in the .dat file. Do not use .get() with default value added
+            # to explicitly print a warning to the console.
+            try:
+                unit_length = self.parameters['unit_length']
+                unit_numberdensity = self.parameters['unit_numberdensity']
+                unit_temperature = self.parameters['unit_temperature']
+                unit_velocity = self.parameters['unit_velocity']
+            # If not present, use default values
+            except KeyError:
+                mylog.warning('No unit normalisations found in datfile and no overrides specified. Using defaults.')
+                unit_length = 1
+                unit_numberdensity = 1
+                unit_temperature = 1
+                unit_velocity = 0
+
+        unit_density = (1.0 + 4.0*He_abundance) * mp * unit_numberdensity
+        if unit_velocity == 0:
+            unit_pressure = float((2.0 + 3.0*He_abundance) * unit_numberdensity * kb * unit_temperature)
+            unit_velocity = float(np.sqrt(unit_pressure / unit_density))
+        else:
+            unit_pressure = float(unit_density * unit_velocity**2)
+            unit_temperature = float(unit_pressure / ((2.0 + 3.0*He_abundance) * unit_numberdensity * kb))
+        unit_magneticfield = np.sqrt(mu0 * unit_pressure)
+
+        # set units
+        if self._usr_unit_system == 'mks':
+            unit_density = self.quan(unit_density, 'kg*m**-3')
+            unit_length = self.quan(unit_length, 'm')
+            unit_numberdensity = self.quan(unit_numberdensity, 'm**-3')
+            unit_velocity = self.quan(unit_velocity, 'm*s**-1')
+            unit_pressure = self.quan(unit_pressure, 'Pa')
+            unit_magneticfield = self.quan(unit_magneticfield, 'T')
+        else:
+            unit_density = self.quan(unit_density, 'g*cm**-3')
+            unit_length = self.quan(unit_length, 'cm')
+            unit_numberdensity = self.quan(unit_numberdensity, 'cm**-3')
+            unit_velocity = self.quan(unit_velocity, 'cm*s**-1')
+            unit_pressure = self.quan(unit_pressure, 'dyn*cm**-2')
+            unit_magneticfield = self.quan(unit_magneticfield, 'gauss')
+        unit_temperature = self.quan(unit_temperature, 'K')
+        unit_time = unit_length / unit_velocity
+        unit_mass = unit_density * unit_length**3
+
+        setdefaultattr(self, "length_unit", unit_length)
+        setdefaultattr(self, "mass_unit", unit_mass)
+        setdefaultattr(self, "time_unit", unit_time)
+
+        setdefaultattr(self, "velocity_unit", unit_velocity)
+        setdefaultattr(self, "density_unit", unit_density)
+        setdefaultattr(self, "numberdensity_unit", unit_numberdensity)
+
+        setdefaultattr(self, "temperature_unit", unit_temperature)
+        setdefaultattr(self, "pressure_unit", unit_pressure)
+        setdefaultattr(self, "magnetic_unit", unit_magneticfield)
