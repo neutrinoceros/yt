@@ -344,3 +344,5 @@ class AMRVACDataset(Dataset):
         setdefaultattr(self, "temperature_unit", unit_temperature)
         setdefaultattr(self, "pressure_unit", unit_pressure)
         setdefaultattr(self, "magnetic_unit", unit_magneticfield)
+
+        del self._usr_unit_system
