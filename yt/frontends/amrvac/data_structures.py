@@ -253,26 +253,19 @@ class AMRVACDataset(Dataset):
         # instead of overriding them again
 
         # First check if overrides have been supplied, if that's the case use those instead.
+        # If not, use AMRVAC default values.
         # Assume cgs values and let YT handle conversion if supplied in an 'mks' unit system.
-        if self.units_override:
-            length_override = self.units_override.get('length_unit', (1, 'cm'))
-            numberdensity_override = self.units_override.get('numberdensity_unit', (1, 'cm**-3'))
-            velocity_override = self.units_override.get('velocity_unit', (0, 'cm*s**-1'))
-            temperature_override = self.units_override.get('temperature_unit', (1, 'K'))
-            mylog.info('Overriding numberdensity_unit: {:1.0e} {}.'.format(numberdensity_override[0],
-                                                                           numberdensity_override[1]))
-        else:
-            # if nothing is specified, use the default AMRVAC normalisations
-            length_override = (1, 'cm')
-            numberdensity_override = (1, 'cm**-3')
-            temperature_override = (1, 'K')
-            velocity_override = (0, 'cm*s**-1')
+        length_override = self.units_override.get('length_unit', (1, 'cm'))
+        numberdensity_override = self.units_override.get('numberdensity_unit', (1, 'cm**-3'))
+        velocity_override = self.units_override.get('velocity_unit', (0, 'cm*s**-1'))
+        temperature_override = self.units_override.get('temperature_unit', (1, 'K'))
+        mylog.info('Overriding numberdensity_unit: {:1.0e} {}.'.format(*numberdensity_override))
 
         # Create YT quantities
-        length_unit = self.quan(length_override[0], length_override[1])
-        numberdensity_unit = self.quan(numberdensity_override[0], numberdensity_override[1])
-        temperature_unit = self.quan(temperature_override[0], temperature_override[1])
-        velocity_unit = self.quan(velocity_override[0], velocity_override[1])
+        length_unit = self.quan(*length_override)
+        numberdensity_unit = self.quan(*numberdensity_override)
+        temperature_unit = self.quan(*temperature_override)
+        velocity_unit = self.quan(*velocity_override)
 
         He_abundance = 0.1  # hardcoded parameter in AMRVAC
         density_unit = (1.0 + 4.0*He_abundance) * mass_hydrogen_cgs * numberdensity_unit
@@ -288,9 +281,6 @@ class AMRVACDataset(Dataset):
         mass_unit = density_unit * length_unit**3
         magneticfield_unit = (np.sqrt(4*np.pi * pressure_unit)).to('gauss')
 
-        # Finally we set the attributes. This extends the attributes coming from Dataset._override_code_units().
-        # Those that are already defined as attributes (i.e. those supplied to override_units when loading) are
-        # not overridden.
         setdefaultattr(self, "length_unit", length_unit)
         setdefaultattr(self, "mass_unit", mass_unit)
         setdefaultattr(self, "time_unit", time_unit)
