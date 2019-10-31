@@ -255,56 +255,50 @@ class AMRVACDataset(Dataset):
         # First check if overrides have been supplied, if that's the case use those instead.
         # Assume cgs values and let YT handle conversion if supplied in an 'mks' unit system.
         if self.units_override:
-            unit_length = self.units_override.get('length_unit', (1, 'cm'))
-            unit_numberdensity = self.units_override.get('numberdensity_unit', (1, 'cm**-3'))
-            unit_velocity = self.units_override.get('velocity_unit', (0, 'cm*s**-1'))
-            unit_temperature = self.units_override.get('temperature_unit', (1, 'K'))
-            mylog.info('Overriding numberdensity_unit: {:1.0e} {}.'.format(unit_numberdensity[0], unit_numberdensity[1]))
+            length_override = self.units_override.get('length_unit', (1, 'cm'))
+            numberdensity_override = self.units_override.get('numberdensity_unit', (1, 'cm**-3'))
+            velocity_override = self.units_override.get('velocity_unit', (0, 'cm*s**-1'))
+            temperature_override = self.units_override.get('temperature_unit', (1, 'K'))
+            mylog.info('Overriding numberdensity_unit: {:1.0e} {}.'.format(numberdensity_override[0],
+                                                                           numberdensity_override[1]))
         else:
-            # Next, check for unit normalisations in the .dat file. Do not use .get() with default value added
-            # to explicitly print a warning to the console.
-            try:
-                unit_length = (self.parameters['unit_length'], 'cm')
-                unit_numberdensity = (self.parameters['unit_numberdensity'], 'cm**-3')
-                unit_temperature = (self.parameters['unit_temperature'], 'K')
-                unit_velocity = (self.parameters['unit_velocity'], 'cm*s**-1')
-            # If nothing present in datfile, use default values and print warning
-            except KeyError:
-                mylog.warning('No unit normalisations found in datfile and no overrides specified. Using defaults.')
-                unit_length = (1, 'cm')
-                unit_numberdensity = (1, 'cm**-3')
-                unit_temperature = (1, 'K')
-                unit_velocity = (0, 'cm*s**-1')
+            # if nothing is specified, use the default AMRVAC normalisations
+            length_override = (1, 'cm')
+            numberdensity_override = (1, 'cm**-3')
+            temperature_override = (1, 'K')
+            velocity_override = (0, 'cm*s**-1')
 
-        # Convert to YT quantities
-        unit_length = self.quan(unit_length[0], unit_length[1])
-        unit_numberdensity = self.quan(unit_numberdensity[0], unit_numberdensity[1])
-        unit_temperature = self.quan(unit_temperature[0], unit_temperature[1])
-        unit_velocity = self.quan(unit_velocity[0], unit_velocity[1])
+        # Create YT quantities
+        length_unit = self.quan(length_override[0], length_override[1])
+        numberdensity_unit = self.quan(numberdensity_override[0], numberdensity_override[1])
+        temperature_unit = self.quan(temperature_override[0], temperature_override[1])
+        velocity_unit = self.quan(velocity_override[0], velocity_override[1])
 
-        He_abundance = 0.1  # hardcoded in AMRVAC
-
-        unit_density = (1.0 + 4.0*He_abundance) * mass_hydrogen_cgs * unit_numberdensity
-        if unit_velocity == 0:
-            unit_pressure = ((2.0 + 3.0*He_abundance) *
-                             unit_numberdensity * boltzmann_constant_cgs  * unit_temperature).to('dyn*cm**-2')
-            unit_velocity = (np.sqrt(unit_pressure / unit_density)).to('cm*s**-1')
+        He_abundance = 0.1  # hardcoded parameter in AMRVAC
+        density_unit = (1.0 + 4.0*He_abundance) * mass_hydrogen_cgs * numberdensity_unit
+        if velocity_unit == 0:
+            pressure_unit = ((2.0 + 3.0*He_abundance) *
+                             numberdensity_unit * boltzmann_constant_cgs  * temperature_unit).to('dyn*cm**-2')
+            velocity_unit = (np.sqrt(pressure_unit / density_unit)).to('cm*s**-1')
         else:
-            unit_pressure = (unit_density * unit_velocity**2).to('dyn*cm**-2')
-            unit_temperature = (unit_pressure /
-                                ((2.0 + 3.0*He_abundance) * unit_numberdensity * boltzmann_constant_cgs)).to('K')
-        unit_time = unit_length / unit_velocity
-        unit_mass = unit_density * unit_length**3
-        unit_magneticfield = (np.sqrt(4*np.pi * unit_pressure)).to('gauss')
+            pressure_unit = (density_unit * velocity_unit**2).to('dyn*cm**-2')
+            temperature_unit = (pressure_unit /
+                                ((2.0 + 3.0*He_abundance) * numberdensity_unit * boltzmann_constant_cgs)).to('K')
+        time_unit = length_unit / velocity_unit
+        mass_unit = density_unit * length_unit**3
+        magneticfield_unit = (np.sqrt(4*np.pi * pressure_unit)).to('gauss')
 
-        setdefaultattr(self, "length_unit", unit_length)
-        setdefaultattr(self, "mass_unit", unit_mass)
-        setdefaultattr(self, "time_unit", unit_time)
+        # Finally we set the attributes. This extends the attributes coming from Dataset._override_code_units().
+        # Those that are already defined as attributes (i.e. those supplied to override_units when loading) are
+        # not overridden.
+        setdefaultattr(self, "length_unit", length_unit)
+        setdefaultattr(self, "mass_unit", mass_unit)
+        setdefaultattr(self, "time_unit", time_unit)
 
-        setdefaultattr(self, "velocity_unit", unit_velocity)
-        setdefaultattr(self, "density_unit", unit_density)
-        setdefaultattr(self, "numberdensity_unit", unit_numberdensity)
+        setdefaultattr(self, "velocity_unit", velocity_unit)
+        setdefaultattr(self, "density_unit", density_unit)
+        setdefaultattr(self, "numberdensity_unit", numberdensity_unit)
 
-        setdefaultattr(self, "temperature_unit", unit_temperature)
-        setdefaultattr(self, "pressure_unit", unit_pressure)
-        setdefaultattr(self, "magnetic_unit", unit_magneticfield)
+        setdefaultattr(self, "temperature_unit", temperature_unit)
+        setdefaultattr(self, "pressure_unit", pressure_unit)
+        setdefaultattr(self, "magnetic_unit", magneticfield_unit)
