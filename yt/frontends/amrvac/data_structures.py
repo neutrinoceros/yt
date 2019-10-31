@@ -269,7 +269,7 @@ class AMRVACDataset(Dataset):
 
         He_abundance = 0.1  # hardcoded parameter in AMRVAC
         density_unit = (1.0 + 4.0*He_abundance) * mass_hydrogen_cgs * numberdensity_unit
-        if velocity_unit == 0:
+        if velocity_unit.value == 0:
             pressure_unit = ((2.0 + 3.0*He_abundance) *
                              numberdensity_unit * boltzmann_constant_cgs  * temperature_unit).to('dyn*cm**-2')
             velocity_unit = (np.sqrt(pressure_unit / density_unit)).to('cm*s**-1')
