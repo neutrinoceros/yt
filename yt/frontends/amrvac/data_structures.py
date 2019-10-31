@@ -31,8 +31,7 @@ from yt.data_objects.static_output import \
    Dataset
 from yt.utilities.physical_constants import \
     mass_hydrogen_cgs, \
-    boltzmann_constant_cgs, \
-    mu_0
+    boltzmann_constant_cgs
 
 from .fields import AMRVACFieldInfo
 from .datfile_utils import get_header, get_tree_info
@@ -283,18 +282,17 @@ class AMRVACDataset(Dataset):
         unit_temperature = self.quan(unit_temperature[0], unit_temperature[1])
         unit_velocity = self.quan(unit_velocity[0], unit_velocity[1])
 
-        # constants needed for conversion to AMRVAC normalisations
         He_abundance = 0.1  # hardcoded in AMRVAC
-        mp = mass_hydrogen_cgs
-        kb = boltzmann_constant_cgs
 
-        unit_density = (1.0 + 4.0*He_abundance) * mp * unit_numberdensity
+        unit_density = (1.0 + 4.0*He_abundance) * mass_hydrogen_cgs * unit_numberdensity
         if unit_velocity == 0:
-            unit_pressure = ((2.0 + 3.0*He_abundance) * unit_numberdensity * kb * unit_temperature).to('dyn*cm**-2')
+            unit_pressure = ((2.0 + 3.0*He_abundance) *
+                             unit_numberdensity * boltzmann_constant_cgs  * unit_temperature).to('dyn*cm**-2')
             unit_velocity = (np.sqrt(unit_pressure / unit_density)).to('cm*s**-1')
         else:
             unit_pressure = (unit_density * unit_velocity**2).to('dyn*cm**-2')
-            unit_temperature = (unit_pressure / ((2.0 + 3.0*He_abundance) * unit_numberdensity * kb)).to('K')
+            unit_temperature = (unit_pressure /
+                                ((2.0 + 3.0*He_abundance) * unit_numberdensity * boltzmann_constant_cgs)).to('K')
         unit_time = unit_length / unit_velocity
         unit_mass = unit_density * unit_length**3
         unit_magneticfield = (np.sqrt(4*np.pi * unit_pressure)).to('gauss')
