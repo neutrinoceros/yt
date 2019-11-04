@@ -252,6 +252,9 @@ class AMRVACDataset(Dataset):
         # This is the reason why it uses setdefaultattr: it will only fill the gaps lefts by the "override",
         # instead of overriding them again
 
+        # check for inconsistencies between override_units and amrvac normalisations
+        self._check_override_units_amrvac()
+
         # First check if overrides have been supplied, if that's the case use those instead.
         # If not, use AMRVAC default values.
         # Assume cgs values and let YT handle conversion if supplied in an 'mks' unit system.
@@ -292,3 +295,26 @@ class AMRVACDataset(Dataset):
         setdefaultattr(self, "temperature_unit", temperature_unit)
         setdefaultattr(self, "pressure_unit", pressure_unit)
         setdefaultattr(self, "magnetic_unit", magneticfield_unit)
+
+    def _check_override_units_amrvac(self):
+        # frontend specific method
+        # note: normalisations in AMRVAC have 3 degrees of freedom. The user can specify a unit length and unit
+        # numberdensity, with the third option either a unit temperature OR unit velocity.
+        # If unit temperature is specified then unit velocity will be calculated accordingly, and vice-versa.
+        # AMRVAC does not allow to specify any other normalisation beside those four.
+        # YT does support overriding other normalisations, this method checks for inconsistencies between
+        # supplied 'units_override' items and those allowed by AMRVAC.
+        if not self.units_override:
+            return
+
+        accepted_overrides = ['length_unit', 'numberdensity_unit', 'temperature_unit', 'velocity_unit']
+
+        # note: _override_code_units() has already been called, so self.units_override has been set
+        for unit_override_name in self.units_override:
+            if not unit_override_name in accepted_overrides:
+                raise ValueError('Only length, numberdensity, temperature or velocity are '
+                                 'accepted overrides for amrvac! ({} was supplied)'.format(unit_override_name))
+
+        if hasattr(self, 'temperature_unit') and hasattr(self, 'velocity_unit'):
+            raise ValueError('Both temperature and velocity have been supplied as overrides. '
+                             'Only one of them is allowed.')
