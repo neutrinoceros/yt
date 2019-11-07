@@ -312,7 +312,7 @@ class AMRVACDataset(Dataset):
                 numberdensity_unit = self.quan(*numberdensity_override)
                 mylog.info('Overriding numberdensity_unit: {:1.0e}.'.format(numberdensity_unit))
                 density_unit = (1.0 + 4.0 * He_abundance) * mass_hydrogen_cgs * numberdensity_unit
-                mass_unit = density_unit * length_unit ** 3
+                mass_unit = density_unit * length_unit**3
 
             # if unit time is supplied, calculate velocity from that
             if self.units_override.get('time_unit') is not None:
@@ -329,7 +329,6 @@ class AMRVACDataset(Dataset):
                                                      * boltzmann_constant_cgs)).to('K')
                 # explicitly calculate time like this, to avoid overwriting the case where time_unit is supplied
                 time_unit = getattr(self, 'time_unit', length_unit/velocity_unit)
-
             # else check if temperature unit is supplied. If not, use default value
             else:
                 temperature_unit = getattr(self, 'temperature_unit', self.quan(1, 'K'))
@@ -346,6 +345,7 @@ class AMRVACDataset(Dataset):
                              'mass_unit': mass_unit, 'magnetic_unit': magnetic_unit}
 
         return amrvac_units_dict
+
 
     def _check_override_consistency(self):
         # frontend specific method
