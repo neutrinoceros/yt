@@ -30,7 +30,6 @@ from yt.funcs import \
 from yt.data_objects.static_output import \
    Dataset
 from yt.utilities.physical_constants import \
-    mass_hydrogen_cgs, \
     boltzmann_constant_cgs
 
 from .fields import AMRVACFieldInfo
@@ -279,6 +278,9 @@ class AMRVACDataset(Dataset):
         # note: _override_code_units() has already been called, so self.units_override has been set
         self._check_override_consistency()
 
+        # note: yt sets hydrogen mass equal to proton mass... This value is taken from AstroPy
+        proton_mass_cgs = self.quan(1.672621898e-24, 'g')
+
         # note: _override_code_units() sets supplied items in units_override as attributes.
         # Handled items are length, time, mass, velocity, magnetic, temperature
 
@@ -291,7 +293,7 @@ class AMRVACDataset(Dataset):
         if not self.units_override:
             numberdensity_unit = self.quan(1, 'cm**-3')
             temperature_unit = self.quan(1, 'K')
-            density_unit = (1.0 + 4.0 * He_abundance) * mass_hydrogen_cgs * numberdensity_unit
+            density_unit = (1.0 + 4.0 * He_abundance) * proton_mass_cgs * numberdensity_unit
             pressure_unit = ((2.0 + 3.0 * He_abundance) *
                              numberdensity_unit * boltzmann_constant_cgs * temperature_unit).to('dyn*cm**-2')
             velocity_unit = (np.sqrt(pressure_unit / density_unit)).to('cm*s**-1')
@@ -304,14 +306,14 @@ class AMRVACDataset(Dataset):
             if self.units_override.get('mass_unit') is not None:
                 mass_unit = self.mass_unit
                 density_unit = mass_unit / length_unit**3
-                numberdensity_unit = density_unit / ((1.0 + 4.0*He_abundance) * mass_hydrogen_cgs)
+                numberdensity_unit = density_unit / ((1.0 + 4.0*He_abundance) * proton_mass_cgs)
             # else use unit numberdensity if supplied. If not, use default value
             else:
                 numberdensity_override = self.units_override.get('numberdensity_unit', (1, 'cm**-3'))
                 # do it like this, because this is never set as an attribute in _override_code_units()
                 numberdensity_unit = self.quan(*numberdensity_override)
                 mylog.info('Overriding numberdensity_unit: {:1.0e}.'.format(numberdensity_unit))
-                density_unit = (1.0 + 4.0 * He_abundance) * mass_hydrogen_cgs * numberdensity_unit
+                density_unit = (1.0 + 4.0 * He_abundance) * proton_mass_cgs * numberdensity_unit
                 mass_unit = density_unit * length_unit**3
 
             # if unit time is supplied, calculate velocity from that
