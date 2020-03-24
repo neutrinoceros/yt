@@ -106,6 +106,12 @@ class CylindricalCoordinateHandler(CoordinateHandler):
             return self._ortho_pixelize(data_source, field, bounds, size,
                                         antialias, dimension, periodic)
         elif ax_name == "z":
+            if self.ds._pseudo_cartesian:
+                print("yo")
+                from .cartesian_coordinates import CartesianCoordinateHandler
+                if self.axis_id.get(dimension, dimension) < 3:
+                    return CartesianCoordinateHandler._ortho_pixelize(self, data_source, field, bounds, size, antialias, dimension, periodic)
+                return CartesianCoordinateHandler.pixelize(self, dimension, data_source, field, bounds, size, antialias, periodic)
             return self._cyl_pixelize(data_source, field, bounds, size,
                                         antialias)
         else:

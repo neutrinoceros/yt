@@ -172,6 +172,7 @@ class Dataset(object):
     particle_types = ("io",) # By default we have an 'all'
     particle_types_raw = ("io",)
     geometry = "cartesian"
+    pseudo_cartesian = False
     coordinates = None
     storage_filename = None
     particle_unions = None
@@ -245,6 +246,8 @@ class Dataset(object):
         self.min_level = 0
         self.no_cgs_equiv_length = False
 
+        #self._pseudo_cartesian = pseudo_cartesian
+        #breakpoint()
         self._create_unit_registry()
 
         self._parse_parameter_file()
@@ -552,6 +555,7 @@ class Dataset(object):
 
     def _setup_coordinate_handler(self):
         kwargs = {}
+        #breakpoint()
         if isinstance(self.geometry, tuple):
             self.geometry, ordering = self.geometry
             kwargs['ordering'] = ordering
@@ -565,6 +569,9 @@ class Dataset(object):
             cls = self.geometry
         elif self.geometry == "cartesian":
             cls = CartesianCoordinateHandler
+        #elif self._pseudo_cartesian:
+            #breakpoint()
+        #    cls = CartesianCoordinateHandler
         elif self.geometry == "cylindrical":
             cls = CylindricalCoordinateHandler
         elif self.geometry == "polar":

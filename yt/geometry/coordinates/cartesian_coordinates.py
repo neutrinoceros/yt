@@ -91,6 +91,7 @@ class CartesianCoordinateHandler(CoordinateHandler):
             rv  = data["index", "dx"].copy(order='K')
             rv *= data["index", "dy"]
             rv *= data["index", "dz"]
+
             return rv
         registry.add_field(("index", "cell_volume"), sampling_type="cell",  function=_cell_volume,
                            display_field=False, units = "code_length**3")

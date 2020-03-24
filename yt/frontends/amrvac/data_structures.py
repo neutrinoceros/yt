@@ -137,6 +137,7 @@ class AMRVACDataset(Dataset):
     _field_info_class = AMRVACFieldInfo
 
     def __init__(self, filename, dataset_type='amrvac',
+                pseudo_cartesian=False,
                 units_override=None, unit_system="cgs",
                 geometry_override=None,
                 parfiles=None):
@@ -149,6 +150,9 @@ class AMRVACDataset(Dataset):
 
         dataset_type : str, optional
             This should always be 'amrvac'.
+
+        pseudo_cartesian : bool, optional
+            Force cartesian-like coordinates handler (wip), default False
 
         units_override : dict, optional
             A dictionnary of physical normalisation factors to interpret on disk data.
@@ -168,7 +172,8 @@ class AMRVACDataset(Dataset):
         # note: geometry_override and parfiles are specific to this frontend
 
         self._geometry_override = geometry_override
-        super(AMRVACDataset, self).__init__(filename, dataset_type,
+        self._pseudo_cartesian = pseudo_cartesian
+        super(AMRVACDataset, self).__init__(filename, dataset_type, pseudo_cartesian,
                                             units_override=units_override, unit_system=unit_system)
 
         self._parfiles = parfiles
