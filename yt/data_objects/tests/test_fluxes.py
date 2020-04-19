@@ -61,7 +61,8 @@ class ExporterTests(TestCase):
                             units=('g/cm**3', 'K'))
         sp = ds.sphere("max", (1.0, "cm"))
         surf = ds.surface(sp, "density", 0.5)
-        surf.export_obj("my_galaxy", transparency=1.0, dist_fac=1.0)
+        color_map = 'arbre'
+        surf.export_obj("my_galaxy", transparency=1.0, dist_fac=1.0, color_map=color_map)
         assert os.path.exists('my_galaxy.obj')
         assert os.path.exists('my_galaxy.mtl')
 
@@ -74,7 +75,8 @@ class ExporterTests(TestCase):
                             transparency=trans[i],
                             color_field='temperature', dist_fac=1.0,
                             plot_index=i, color_field_max=ma,
-                            color_field_min=mi)
+                            color_field_min=mi,
+                            color_map='arbre')
 
         assert os.path.exists('my_galaxy_color.obj')
         assert os.path.exists('my_galaxy_color.mtl')
@@ -90,7 +92,8 @@ class ExporterTests(TestCase):
                             transparency=trans[i],
                             color_field='temperature',
                             emit_field='emissivity',
-                            dist_fac=1.0, plot_index=i)
+                            dist_fac=1.0, plot_index=i,
+                            color_map='arbre')
 
         assert os.path.exists('my_galaxy_emis.obj')
         assert os.path.exists('my_galaxy_emis.mtl')
