@@ -17,10 +17,9 @@ Will initialize everything, and associate one with each module
 import logging
 import sys
 from yt.config import ytcfg
-
+from rich.logging import RichHandler
 # This next bit is grabbed from:
 # http://stackoverflow.com/questions/384076/how-can-i-make-the-python-logging-output-to-be-colored
-
 
 def add_coloring_to_emit_ansi(fn):
     # add methods we need to the class
@@ -60,37 +59,18 @@ def disable_stream_logging():
     h = logging.NullHandler()
     ytLogger.addHandler(h)
 
-def colorize_logging():
-    f = logging.Formatter(cfstring)
-    ytLogger.handlers[0].setFormatter(f)
-    yt_sh.emit = add_coloring_to_emit_ansi(yt_sh.emit)
-
-def uncolorize_logging():
-    try:
-        f = logging.Formatter(ufstring)
-        ytLogger.handlers[0].setFormatter(f)
-        yt_sh.emit = original_emitter
-    except NameError:
-        # yt_sh and original_emitter are not defined because
-        # suppressStreamLogging is True, so we continue since there is nothing
-        # to uncolorize
-        pass
-
 if ytcfg.getboolean("yt", "suppressStreamLogging"):
     disable_stream_logging()
 else:
-    yt_sh = logging.StreamHandler(stream=stream)
-    # create formatter and add it to the handlers
-    formatter = logging.Formatter(ufstring)
-    yt_sh.setFormatter(formatter)
+    #handler = logging.StreamHandler(stream=stream)
+    handler = RichHandler() # weakness, RichHandler.__init__() doesn't have a "stream" argument (yet?)
+
     # add the handler to the logger
-    ytLogger.addHandler(yt_sh)
+    ytLogger.addHandler(handler)
     ytLogger.setLevel(level)
     ytLogger.propagate = False
 
-    original_emitter = yt_sh.emit
-
-    if ytcfg.getboolean("yt", "coloredlogs"):
-        colorize_logging()
+    f = logging.Formatter("%(name)-3s: %(message)s")
+    ytLogger.handlers[0].setFormatter(f)
 
 ytLogger.debug("Set log level to %s", level)
