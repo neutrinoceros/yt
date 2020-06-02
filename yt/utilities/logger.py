@@ -18,6 +18,7 @@ import logging
 import sys
 from yt.config import ytcfg
 from rich.logging import RichHandler
+from rich.console import Console
 # This next bit is grabbed from:
 # http://stackoverflow.com/questions/384076/how-can-i-make-the-python-logging-output-to-be-colored
 
@@ -62,8 +63,7 @@ def disable_stream_logging():
 if ytcfg.getboolean("yt", "suppressStreamLogging"):
     disable_stream_logging()
 else:
-    #handler = logging.StreamHandler(stream=stream)
-    handler = RichHandler() # weakness, RichHandler.__init__() doesn't have a "stream" argument (yet?)
+    handler = RichHandler(console=Console(file=stream, width=120))
 
     # add the handler to the logger
     ytLogger.addHandler(handler)
