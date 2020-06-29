@@ -37,12 +37,12 @@ def test_pattern_expansion(tmpdir):
 def test_no_match_pattern():
     with tempfile.TemporaryDirectory() as tmpdir:
         pattern = os.path.join(tmpdir, "fake_data_file_*")
-        assert_raises(FileNotFoundError, get_filenames_from_glob_pattern, pattern)
+        assert_raises(IOError, get_filenames_from_glob_pattern, pattern)
 
 # future: equivalent implementation using pytest fixtures
 """
 def test_no_match_pattern(tmpdir):
     pattern = tmpdir.join("fake_data_file_*")
-    with pytest.raises(FileNotFoundError):
+    with pytest.raises(IOError):
         get_filenames_from_glob_pattern(pattern)
 """
