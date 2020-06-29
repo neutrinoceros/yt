@@ -57,7 +57,7 @@ def get_ds_prop(propname):
                 dict(eval = _eval, _params = tuple()))
     return cls
 
-def get_filenames_from_glob_pattern(pattern):
+def get_filenames_from_glob_pattern(pattern, sortkey=None):
     epattern = os.path.expanduser(pattern)
     data_dir = ytcfg.get("yt", "test_data_dir")
     # if not match if found from the current work dir,
@@ -65,7 +65,7 @@ def get_filenames_from_glob_pattern(pattern):
     file_list = glob.glob(epattern) or glob.glob(os.path.join(data_dir, pattern))
     if not file_list:
         raise IOError("No match found for pattern : {}".format(pattern))
-    return sorted(file_list)
+    return sorted(file_list, key=sortkey)
 
 attrs = ("refine_by", "dimensionality", "current_time",
          "domain_dimensions", "domain_left_edge",
@@ -118,6 +118,8 @@ class DatasetSeries(object):
         Set to True if the DatasetSeries will load different dataset types, set
         to False if loading dataset of a single type as this will result in a
         considerable speed up from not having to figure out the dataset type.
+    sortkey : func
+        A custom sortkey. Defaults to None.
 
     Examples
     --------
@@ -138,9 +140,9 @@ class DatasetSeries(object):
     ...     SlicePlot(ds, "x", "Density").save()
 
     """
-    def __new__(cls, outputs, *args, **kwargs):
+    def __new__(cls, outputs, sortkey=None, *args, **kwargs):
         if isinstance(outputs, str):
-            outputs = get_filenames_from_glob_pattern(outputs)
+            outputs = get_filenames_from_glob_pattern(outputs, sortkey=sortkey)
         ret = super(DatasetSeries, cls).__new__(cls)
         try:
             ret._pre_outputs = outputs[:]
