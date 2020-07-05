@@ -33,7 +33,10 @@ class AMRVACIOHandler(BaseIOHandler):
 
         # store these shape for intensive reuse in _read_data
         self.block_shape = np.append(header["block_nx"], header["nw"])
-        self.field_shape = self.block_shape[:-1]
+
+        # retrieve data as 3D arrays, as grid.ActiveDimensions is always 3D
+        self.field_shape = np.ones(3, dtype="int64")
+        self.field_shape[:len(self.block_shape[:-1])] = self.block_shape[:-1]
         self.field_per_block_size = np.prod(self.field_shape)
 
     def _read_particle_coords(self, chunks, ptf):
@@ -68,6 +71,7 @@ class AMRVACIOHandler(BaseIOHandler):
             A 3D array of float64 type representing grid data.
 
         """
+
         with open(self.datfile, "rb") as file_obj:
             data = get_single_block_field_data(
                 file_obj,
@@ -76,10 +80,6 @@ class AMRVACIOHandler(BaseIOHandler):
                 field_idx=self.ds.parameters['w_names'].index(field),
                 output_shape=self.field_shape
             )
-
-        # Always convert data to 3D, as grid.ActiveDimensions is always 3D
-        while len(data.shape) < 3:
-            data = data[..., np.newaxis]
         return data
 
     def _read_fluid_selection(self, chunks, selector, fields, size):
