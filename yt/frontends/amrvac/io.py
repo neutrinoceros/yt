@@ -17,7 +17,8 @@ from yt.utilities.io_handler import \
     BaseIOHandler
 from yt.geometry.selection_routines import \
     GridSelector
-from .datfile_utils import get_single_block_field_data
+#from .datfile_utils import get_single_block_field_data
+from .io_utils import get_single_block_field_data
 
 
 class AMRVACIOHandler(BaseIOHandler):
@@ -29,7 +30,11 @@ class AMRVACIOHandler(BaseIOHandler):
         self.ds = ds
         self.datfile = ds.parameter_filename
         header = self.ds.parameters
+
+        # store these shape for intensive reuse in _read_data
         self.block_shape = np.append(header["block_nx"], header["nw"])
+        self.field_shape = self.block_shape[:-1]
+        self.field_per_block_size = np.prod(self.field_shape)
 
     def _read_particle_coords(self, chunks, ptf):
         """Not implemented yet."""
@@ -63,11 +68,14 @@ class AMRVACIOHandler(BaseIOHandler):
             A 3D array of float64 type representing grid data.
 
         """
-        ileaf = grid.id
-        offset = grid._index.block_offsets[ileaf]
-        field_idx = self.ds.parameters['w_names'].index(field)
-        with open(self.datfile, "rb") as istream:
-            data = get_single_block_field_data(istream, offset, self.block_shape, field_idx)
+        with open(self.datfile, "rb") as file_obj:
+            data = get_single_block_field_data(
+                file_obj,
+                block_offset=grid._index.block_offsets[grid.id],
+                field_per_block_size=self.field_per_block_size,
+                field_idx=self.ds.parameters['w_names'].index(field),
+                output_shape=self.field_shape
+            )
 
         # Always convert data to 3D, as grid.ActiveDimensions is always 3D
         while len(data.shape) < 3:

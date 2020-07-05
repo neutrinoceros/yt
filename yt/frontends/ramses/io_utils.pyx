@@ -7,6 +7,7 @@ from yt.utilities.cython_fortran_utils cimport FortranFile
 from yt.geometry.oct_container cimport RAMSESOctreeContainer
 from yt.utilities.exceptions import YTIllDefinedAMRData
 
+
 ctypedef np.int32_t INT32_t
 ctypedef np.int64_t INT64_t
 ctypedef np.float64_t DOUBLE_t
