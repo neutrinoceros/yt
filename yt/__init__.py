@@ -175,4 +175,24 @@ from yt.utilities.math_utils import ortho_find, quartiles, periodic_position
 
 from yt.units.unit_systems import UnitSystem, unit_system_registry
 
+
+def describe_install():
+    # todo: make this an entry point for CLI
+    # note: some optional deps (like h5py, or pooch) will only be registered at runtime
+    # so this is not a viable solution
+    from yt.utilities.on_demand_imports import NotAModule
+
+    print(f"Yt version: {__version__}")
+
+    missing_modules = set(NotAModule._registry)
+    if missing_modules:
+        print(
+            "The following optional dependencie(s) "
+            "were not found in the current environment :"
+        )
+        print("\n".join(sorted(missing_modules)))
+    else:
+        print("All optional dependencies are available !")
+
+
 _called_from_pytest = False

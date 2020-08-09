@@ -10,12 +10,15 @@ class NotAModule:
     package installed.
     """
 
+    _registry = []
+
     def __init__(self, pkg_name):
         self.pkg_name = pkg_name
         self.error = ImportError(
             "This functionality requires the %s "
             "package to be installed." % self.pkg_name
         )
+        self.__class__._registry.append(pkg_name)
 
     def __getattr__(self, item):
         raise self.error
