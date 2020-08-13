@@ -1,7 +1,7 @@
 from numbers import Number as numeric_type
 
 import numpy as np
-from unyt.exceptions import UnitConversionError, UnitOperationError
+from unyt.exceptions import UnitConversionError  # , UnitOperationError
 
 from yt.fields.field_exceptions import NeedsConfiguration
 from yt.funcs import issue_deprecation_warning, mylog, only_on_root
@@ -493,7 +493,7 @@ class FieldInfoContainer(dict):
                 NeedsConfiguration,
                 # unyt errors
                 # those denote unsanitized data passed down to unyt and should be fixed
-                UnitOperationError,
+                # UnitOperationError,
                 UnitConversionError,
                 # builtin errors
                 # those are probably fine (but should be checked)
