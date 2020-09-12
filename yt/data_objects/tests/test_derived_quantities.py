@@ -21,11 +21,7 @@ def setup():
 
 def test_extrema():
     for nprocs in [1, 2, 4, 8]:
-        ds = fake_random_ds(
-            16,
-            nprocs=nprocs,
-            fields=("density", "velocity_x", "velocity_y", "velocity_z"),
-        )
+        ds = fake_random_ds(16, nprocs=nprocs)
         for sp in [ds.sphere("c", (0.25, "unitary")), ds.r[0.5, :, :]]:
             mi, ma = sp.quantities["Extrema"]("density")
             assert_equal(mi, np.nanmin(sp["density"]))
@@ -43,7 +39,7 @@ def test_extrema():
 
 def test_average():
     for nprocs in [1, 2, 4, 8]:
-        ds = fake_random_ds(16, nprocs=nprocs, fields=("density",))
+        ds = fake_random_ds(16, nprocs=nprocs, fields=("density",), units=("g/cm**3",))
         for ad in [ds.all_data(), ds.r[0.5, :, :]]:
 
             my_mean = ad.quantities["WeightedAverageQuantity"]("density", "ones")
@@ -56,7 +52,7 @@ def test_average():
 
 def test_variance():
     for nprocs in [1, 2, 4, 8]:
-        ds = fake_random_ds(16, nprocs=nprocs, fields=("density",))
+        ds = fake_random_ds(16, nprocs=nprocs, fields=("density",), units=("g/cm**3",))
         for ad in [ds.all_data(), ds.r[0.5, :, :]]:
 
             my_std, my_mean = ad.quantities["WeightedVariance"]("density", "ones")
@@ -75,7 +71,7 @@ def test_variance():
 
 def test_max_location():
     for nprocs in [1, 2, 4, 8]:
-        ds = fake_random_ds(16, nprocs=nprocs, fields=("density",))
+        ds = fake_random_ds(16, nprocs=nprocs, fields=("density",), units=("g/cm**3",))
         for ad in [ds.all_data(), ds.r[0.5, :, :]]:
 
             mv, x, y, z = ad.quantities.max_location(("gas", "density"))
@@ -91,7 +87,7 @@ def test_max_location():
 
 def test_min_location():
     for nprocs in [1, 2, 4, 8]:
-        ds = fake_random_ds(16, nprocs=nprocs, fields=("density",))
+        ds = fake_random_ds(16, nprocs=nprocs, fields=("density",), units=("g/cm**3",))
         for ad in [ds.all_data(), ds.r[0.5, :, :]]:
 
             mv, x, y, z = ad.quantities.min_location(("gas", "density"))
