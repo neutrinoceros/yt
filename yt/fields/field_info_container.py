@@ -1,6 +1,7 @@
 from numbers import Number as numeric_type
 
 import numpy as np
+from unyt.exceptions import UnitConversionError
 
 from yt.funcs import issue_deprecation_warning, mylog, only_on_root
 from yt.geometry.geometry_handler import is_curvilinear
@@ -470,6 +471,8 @@ class FieldInfoContainer(dict):
             fi = self[field]
             try:
                 fd = fi.get_dependencies(ds=self.ds)
+            except UnitConversionError:
+                raise
             except (NotImplementedError, Exception) as e:  # noqa: B014
                 if field in self._show_field_errors:
                     raise
