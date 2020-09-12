@@ -108,7 +108,10 @@ def test_min_location():
 def test_sample_at_min_field_values():
     for nprocs in [1, 2, 4, 8]:
         ds = fake_random_ds(
-            16, nprocs=nprocs, fields=("density", "temperature", "velocity_x")
+            16,
+            nprocs=nprocs,
+            fields=("density", "temperature", "velocity_x"),
+            units=("g/cm**3", "K", "cm/s"),
         )
         for ad in [ds.all_data(), ds.r[0.5, :, :]]:
 
@@ -127,7 +130,10 @@ def test_sample_at_min_field_values():
 def test_sample_at_max_field_values():
     for nprocs in [1, 2, 4, 8]:
         ds = fake_random_ds(
-            16, nprocs=nprocs, fields=("density", "temperature", "velocity_x")
+            16,
+            nprocs=nprocs,
+            fields=("density", "temperature", "velocity_x"),
+            units=("g/cm**3", "K", "cm/s"),
         )
         for ad in [ds.all_data(), ds.r[0.5, :, :]]:
 

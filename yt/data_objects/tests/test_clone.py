@@ -24,7 +24,9 @@ def test_clone_sphere():
 
 
 def test_clone_cut_region():
-    ds = fake_random_ds(64, nprocs=4, fields=("density", "temperature"))
+    ds = fake_random_ds(
+        64, nprocs=4, fields=("density", "temperature"), units=("g/cm**3", "K")
+    )
     dd = ds.all_data()
     reg1 = dd.cut_region(["obj['temperature'] > 0.5", "obj['density'] < 0.75"])
     reg2 = reg1.clone()
