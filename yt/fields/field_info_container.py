@@ -1,6 +1,7 @@
 from numbers import Number as numeric_type
 
 import numpy as np
+from unyt.exceptions import UnitConversionError
 
 from yt.fields.field_exceptions import NeedsConfiguration
 from yt.funcs import issue_deprecation_warning, mylog, only_on_root
@@ -470,6 +471,28 @@ class FieldInfoContainer(dict):
         return keys
 
     def check_derived_fields(self, fields_to_check=None):
+        # define
+        # - a blacklist (exceptions that we know should be caught)
+        # - a whitelist (exceptions that should be handled)
+        # - a greylist (excpetions that may hide bugs but should be checked)
+
+        # in the long run, the greylist should be removed
+        blacklist = (UnitConversionError,)
+        whitelist = (NotImplementedError,)
+        greylist = (
+            YTFieldNotFound,
+            YTDomainOverflow,
+            YTCoordinateNotImplemented,
+            NeedsConfiguration,
+            TypeError,
+            ValueError,
+            IndexError,
+            AttributeError,
+            KeyError,
+            # code smells -> those are very likely bugs
+            RecursionError,
+        )
+
         deps = {}
         unavailable = []
         fields_to_check = fields_to_check or list(self.keys())
@@ -485,25 +508,9 @@ class FieldInfoContainer(dict):
                 # of those deactivated, then see which tests fail and solve the
                 # underlying issues locally.
                 fd = fi.get_dependencies(ds=self.ds)
-            except (
-                # Yt errors
-                # those are probably fine (but should be checked)
-                YTFieldNotFound,
-                YTDomainOverflow,
-                YTCoordinateNotImplemented,
-                NeedsConfiguration,
-                # builtin errors
-                NotImplementedError,  # checked
-                # those are probably fine (but should be checked)
-                TypeError,
-                ValueError,
-                IndexError,
-                AttributeError,
-                KeyError,
-                # other builtin errors
-                # code smells -> those are very likely bugs
-                RecursionError,
-            ) as e:
+            except blacklist:
+                raise
+            except (*whitelist, *greylist) as e:
                 if field in self._show_field_errors:
                     raise
                 if not isinstance(e, YTFieldNotFound):
