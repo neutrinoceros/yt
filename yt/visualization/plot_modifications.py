@@ -304,7 +304,13 @@ class VelocityCallback(PlotCallback):
     """
 
     _type_name = "velocity"
-    _supported_geometries = ("cartesian", "spectral_cube", "polar", "cylindrical")
+    _supported_geometries = (
+        "cartesian",
+        "spectral_cube",
+        "polar",
+        "cylindrical",
+        "spherical",
+    )
 
     def __init__(
         self, factor=16, scale=None, scale_units=None, normalize=False, plot_args=None
@@ -389,7 +395,13 @@ class MagFieldCallback(PlotCallback):
     """
 
     _type_name = "magnetic_field"
-    _supported_geometries = ("cartesian", "spectral_cube", "polar", "cylindrical")
+    _supported_geometries = (
+        "cartesian",
+        "spectral_cube",
+        "polar",
+        "cylindrical",
+        "spherical",
+    )
 
     def __init__(
         self, factor=16, scale=None, scale_units=None, normalize=False, plot_args=None
@@ -465,7 +477,13 @@ class QuiverCallback(PlotCallback):
     """
 
     _type_name = "quiver"
-    _supported_geometries = ("cartesian", "spectral_cube", "polar", "cylindrical")
+    _supported_geometries = (
+        "cartesian",
+        "spectral_cube",
+        "polar",
+        "cylindrical",
+        "spherical",
+    )
 
     def __init__(
         self,
@@ -895,7 +913,13 @@ class StreamlineCallback(PlotCallback):
     """
 
     _type_name = "streamlines"
-    _supported_geometries = ("cartesian", "spectral_cube", "polar", "cylindrical")
+    _supported_geometries = (
+        "cartesian",
+        "spectral_cube",
+        "polar",
+        "cylindrical",
+        "spherical",
+    )
 
     def __init__(
         self,
@@ -1032,7 +1056,13 @@ class LinePlotCallback(PlotCallback):
     """
 
     _type_name = "line"
-    _supported_geometries = ("cartesian", "spectral_cube", "polar", "cylindrical")
+    _supported_geometries = (
+        "cartesian",
+        "spectral_cube",
+        "polar",
+        "cylindrical",
+        "spherical",
+    )
 
     def __init__(self, p1, p2, data_coords=False, coord_system="data", plot_args=None):
         PlotCallback.__init__(self)
@@ -1484,7 +1514,13 @@ class MarkerAnnotateCallback(PlotCallback):
     """
 
     _type_name = "marker"
-    _supported_geometries = ("cartesian", "spectral_cube", "polar", "cylindrical")
+    _supported_geometries = (
+        "cartesian",
+        "spectral_cube",
+        "polar",
+        "cylindrical",
+        "spherical",
+    )
 
     def __init__(self, pos, marker="x", coord_system="data", plot_args=None):
         def_plot_args = {"color": "w", "s": 50}
@@ -1558,7 +1594,13 @@ class SphereCallback(PlotCallback):
     """
 
     _type_name = "sphere"
-    _supported_geometries = ("cartesian", "spectral_cube", "polar", "cylindrical")
+    _supported_geometries = (
+        "cartesian",
+        "spectral_cube",
+        "polar",
+        "cylindrical",
+        "spherical",
+    )
 
     def __init__(
         self,
@@ -1687,7 +1729,13 @@ class TextLabelCallback(PlotCallback):
     """
 
     _type_name = "text"
-    _supported_geometries = ("cartesian", "spectral_cube", "polar", "cylindrical")
+    _supported_geometries = (
+        "cartesian",
+        "spectral_cube",
+        "polar",
+        "cylindrical",
+        "spherical",
+    )
 
     def __init__(
         self,
@@ -2967,7 +3015,13 @@ class LineIntegralConvolutionCallback(PlotCallback):
     """
 
     _type_name = "line_integral_convolution"
-    _supported_geometries = ("cartesian", "spectral_cube", "polar", "cylindrical")
+    _supported_geometries = (
+        "cartesian",
+        "spectral_cube",
+        "polar",
+        "cylindrical",
+        "spherical",
+    )
 
     def __init__(
         self,
