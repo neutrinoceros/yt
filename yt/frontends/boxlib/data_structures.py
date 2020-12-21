@@ -1077,7 +1077,7 @@ class CastroDataset(BoxlibDataset):
 
     _index_class = CastroHierarchy
     _field_info_class = CastroFieldInfo
-    _subtype_keyword = "castro"
+    _subtype_keyword = "Castro Job Information"
     _default_cparam_filename = "job_info"
 
     def __init__(
@@ -1155,7 +1155,7 @@ class CastroDataset(BoxlibDataset):
 class MaestroDataset(BoxlibDataset):
 
     _field_info_class = MaestroFieldInfo
-    _subtype_keyword = "maestro"
+    _subtype_keyword = "MAESTROeX Job Information"
     _default_cparam_filename = "job_info"
 
     def __init__(
