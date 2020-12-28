@@ -54,7 +54,7 @@ def get_date_of_last_tag(repo_path):
 
 
 def get_prs_since_last_release(date, key):
-    headers = {"Authorization": "token %s" % key}
+    headers = {"Authorization": f"token {key}"}
     resp = requests.post(url=API_URL, json={"query": PR_QUERY % ""}, headers=headers)
     ret = []
     while True:
@@ -69,7 +69,7 @@ def get_prs_since_last_release(date, key):
                 ret.append(pr["node"])
         resp = requests.post(
             url=API_URL,
-            json={"query": PR_QUERY % ('after:"%s"' % cursor)},
+            json={"query": PR_QUERY % (f'after:"{cursor}"')},
             headers=headers,
         )
     return ret
@@ -78,12 +78,12 @@ def get_prs_since_last_release(date, key):
 def backport_prs(repo_path, prs):
     for pr in prs:
         print("")
-        print("PR %s" % pr["number"])
+        print(f"PR {pr['number']}")
         print(pr["title"])
         print(pr["author"]["login"])
         print(pr["body"])
         print(pr["url"])
-        print("%s.diff" % pr["url"])
+        print(f"{pr['url']}.diff")
         input("Press any key to continue")
 
 
@@ -102,7 +102,7 @@ if __name__ == "__main__":
         date = get_date_of_last_tag(repo_path)
         prs = get_prs_since_last_release(date, key)
         print("In another terminal window, navigate to the following path:")
-        print("%s" % repo_path)
+        print(f"{repo_path}")
         input("Press any key to continue")
         backport_prs(repo_path, prs)
         input(

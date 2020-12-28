@@ -23,14 +23,14 @@ doc = """\
 try:
     import IPython
 except ImportError:
-    print('ipython is not available. using default python interpreter.')
+    print("ipython is not available. using default python interpreter.")
     import code
     import sys
+
     code.interact(doc, None, namespace)
     sys.exit()
 
-ip_shell = TerminalInteractiveShell(user_ns=namespace, banner1 = doc,
-                                    display_banner = True)
+ip_shell = TerminalInteractiveShell(user_ns=namespace, banner1=doc, display_banner=True)
 if "DISPLAY" in os.environ:
     ip_shell.enable_pylab(import_all=False)
 
@@ -57,7 +57,7 @@ description on what you could do here.
 
 # Most of your config files and extensions will probably start with this import
 
-#import IPython.ipapi
+# import IPython.ipapi
 ip = ip_shell
 try_next = IPython.core.error.TryNext
 kwargs = dict()
@@ -67,6 +67,7 @@ ip.ex("import yt")
 
 # Now we add some tab completers, in the vein of:
 # http://pymel.googlecode.com/svn/trunk/tools/ipymel.py
+
 
 def yt_simple_fieldname_completer(self, event):
     """Match dictionary completions"""
@@ -88,12 +89,13 @@ def yt_simple_fieldname_completer(self, event):
             raise IPython.ipapi.TryNext
 
     if isinstance(obj, YTDataContainer):
-        all_types = list(set(
-            [ftype for ftype, _ in
-             obj.ds.field_list + obj.ds.derived_field_list]))
+        all_types = list(
+            set([ftype for ftype, _ in obj.ds.field_list + obj.ds.derived_field_list])
+        )
         return all_types
 
     raise try_next
+
 
 def yt_tuple_fieldname_completer(self, event):
     """Match dictionary completions"""
@@ -116,16 +118,16 @@ def yt_tuple_fieldname_completer(self, event):
 
     if isinstance(obj, YTDataContainer):
         all_fields = [
-            fname for ftype, fname in
-            obj.ds.field_list + obj.ds.derived_field_list
+            fname
+            for ftype, fname in obj.ds.field_list + obj.ds.derived_field_list
             if prefix == ftype
         ]
         return all_fields
 
-
     raise try_next
 
-ip.set_hook('complete_command', yt_simple_fieldname_completer, re_key = ".*")
-ip.set_hook('complete_command', yt_tuple_fieldname_completer, re_key = ".*")
+
+ip.set_hook("complete_command", yt_simple_fieldname_completer, re_key=".*")
+ip.set_hook("complete_command", yt_tuple_fieldname_completer, re_key=".*")
 
 ip_shell.mainloop(**kwargs)

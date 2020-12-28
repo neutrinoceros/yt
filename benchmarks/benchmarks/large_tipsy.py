@@ -42,7 +42,7 @@ class PKDGravTipsySuite:
         dd = self.ds.all_data()
         dd.quantities.extrema("particle_mass")
         dd.quantities.extrema("particle_velocity_magnitude")
-        dd.quantities.extrema(["particle_velocity_%s" % ax for ax in "xyz"])
+        dd.quantities.extrema([f"particle_velocity_{ax}" for ax in "xyz"])
 
 
 class GasolineTipsySuite(PKDGravTipsySuite):

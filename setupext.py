@@ -224,7 +224,7 @@ def read_embree_location():
         file.write('#include "embree2/rtcore.h"\n' "int main() {\n" "return 0;\n" "}")
         file.flush()
         p = Popen(
-            compiler + ["-I%s/include/" % rd, filename],
+            compiler + [f"-I{rd}/include/", filename],
             stdin=PIPE,
             stdout=PIPE,
             stderr=PIPE,
@@ -374,7 +374,9 @@ def create_build_ext(lib_exts, cythonize_aliases):
             try:
                 super().build_extension(extension)
             except CompileError as exc:
-                print(f"While building '{extension.name}' following error was raised:\n {exc}")
+                print(
+                    f"While building '{extension.name}' following error was raised:\n {exc}"
+                )
                 raise
 
     class sdist(_sdist):
