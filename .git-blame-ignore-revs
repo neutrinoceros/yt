@@ -18,6 +18,9 @@ f7445f02022293f1b089cd8907000301516354bf
 # f-strings, black & isort on doc
 e6276f25fc5a570d886b6bbdaa7e3062da2d35ca
 
+# remove trailing whitespace
+f773dc8d108122e53dea7728e32a2b7da6164feb
+
 # legacy conversion commits authored by "convert-repo"
 b7112d4ccbcd309ae2c5c2ee0f9352466a0cecf2
 33f3988bbfa97399114e3df9ac491c828ae59a8c
