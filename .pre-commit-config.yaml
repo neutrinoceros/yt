@@ -19,21 +19,21 @@ repos:
 # Note that in rare cases, flynt may undo some of the formating from black.
 # A stable configuration is run black last.
 -   repo: https://github.com/ikamensh/flynt
-    rev: '0.52'  # keep in sync with tests/lint_requirements.txt
+    rev: '0.58'  # keep in sync with tests/lint_requirements.txt
     hooks:
     - id: flynt
--   repo: https://github.com/ambv/black
-    rev: 19.10b0  # keep in sync with tests/lint_requirements.txt
+-   repo: https://github.com/psf/black
+    rev: 20.8b1  # keep in sync with tests/lint_requirements.txt
     hooks:
     - id: black
       language_version: python3
--   repo: https://github.com/timothycrosley/isort
-    rev: '5.6.4'  # keep in sync with tests/lint_requirements.txt
+-   repo: https://github.com/PyCQA/isort
+    rev: '5.7.0'  # keep in sync with tests/lint_requirements.txt
     hooks:
     - id: isort
       additional_dependencies: [toml]
 -   repo: https://gitlab.com/pycqa/flake8
-    rev: '3.8.1'  # keep in sync with tests/lint_requirements.txt
+    rev: '3.8.4'  # keep in sync with tests/lint_requirements.txt
     hooks:
     - id: flake8
       additional_dependencies: [mccabe, flake8-bugbear]
