@@ -61,3 +61,9 @@ known_third_party = [
 ]
 known_first_party = ["yt"]
 sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
+
+[tool.vulture]
+paths = ["yt"]
+# incrementaly lower this value to 90, 80 ... to report larger
+# amounts of unused code that is harder to qualify as such
+min_confidence = 100

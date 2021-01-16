@@ -256,11 +256,13 @@ def hashing(request):
         request.config.getoption("--answer-store"),
     )
     if request.config.getoption("--save-answer-arrays"):
+        raise NotImplementedError
         # answer_file has .yaml appended to it, but here we're saving
         # the arrays as .npy files, so we remove the .yaml extension
-        utils._save_arrays(
-            answer_dir,
-            request.cls.answer_file.split(".")[0],
-            request.cls.hashes,
-            request.config.getoption("--answer-store"),
-        )
+
+        # utils._save_arrays(
+        #    answer_dir,
+        #    request.cls.answer_file.split(".")[0],
+        #    request.cls.hashes,
+        #    request.config.getoption("--answer-store"),
+        # )
