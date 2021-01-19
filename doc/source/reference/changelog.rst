@@ -497,7 +497,7 @@ Additional Improvements
   a tuple of strings instead of a string. If a tuple is supplied, the elments
   are joined with ``os.sep`` to form a path. See `PR 1630
   <https://github.com/yt-project/yt/pull/1630>`__.
-- The quiver callback now accepts a ``mpl_kwargs`` keyword argument that allows
+- The quiver callback now accepts a ``plot_args`` keyword argument that allows
   passing keyword arguments to matplotlib to allow for customization of the
   quiver plot. See `PR 1636 <https://github.com/yt-project/yt/pull/1636>`__.
 - Updates and improvements for the OpenPMD frontend. See `PR 1645
@@ -1200,7 +1200,7 @@ Minor enhancements and bugfixes
   get_sph_phi(), etc.
 * Fixed issues involving invalid FRBs when uses called _setup_plots in their
   scripts
-* Added a ``text_kwargs`` keyword to ``annotate_scale()`` callback
+* Added a ``text_args`` keyword to ``annotate_scale()`` callback
 * Added a print_stats function for RAMSES
 * Fixed a number of bugs in the Photon Simulator
 * Added support for particle fields to the [Min,Max]Location derived quantities
