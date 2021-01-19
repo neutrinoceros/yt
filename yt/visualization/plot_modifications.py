@@ -11,7 +11,7 @@ from yt.data_objects.level_sets.clump_handling import Clump
 from yt.data_objects.selection_objects.cut_region import YTCutRegion
 from yt.data_objects.static_output import Dataset
 from yt.frontends.ytdata.data_structures import YTClumpContainer
-from yt.funcs import is_sequence, mylog, validate_width_tuple
+from yt.funcs import is_sequence, issue_deprecation_warning, mylog, validate_width_tuple
 from yt.geometry.geometry_handler import is_curvilinear
 from yt.geometry.unstructured_mesh_handler import UnstructuredIndex
 from yt.units import dimensions
@@ -1853,15 +1853,17 @@ class HaloCatalogCallback(PlotCallback):
     def __init__(
         self,
         halo_catalog,
-        circle_args=None,
-        circle_kwargs=None,
         width=None,
         annotate_field=None,
         radius_field="virial_radius",
         center_field_prefix="particle_position",
-        text_args=None,
-        font_kwargs=None,
         factor=1.0,
+        mpl_kwargs=None,
+        text_kwargs=None,
+        circle_args=None,  # deprecated
+        circle_kwargs=None,  # deprecated
+        text_args=None,  # deprecated
+        font_kwargs=None,  # deprecated
     ):
 
         try:
@@ -1870,8 +1872,6 @@ class HaloCatalogCallback(PlotCallback):
             HaloCatalog = NotAModule("yt_astro_analysis")
 
         PlotCallback.__init__(self)
-        def_circle_args = {"edgecolor": "white", "facecolor": "None"}
-        def_text_args = {"color": "white"}
 
         if isinstance(halo_catalog, YTDataContainer):
             self.halo_data = halo_catalog
@@ -1892,25 +1892,33 @@ class HaloCatalogCallback(PlotCallback):
         self.radius_field = radius_field
         self.center_field_prefix = center_field_prefix
         self.annotate_field = annotate_field
-        if circle_kwargs is not None:
-            circle_args = circle_kwargs
-            warnings.warn(
-                "The circle_kwargs keyword is deprecated.  Please "
-                "use the circle_args keyword instead."
-            )
-        if font_kwargs is not None:
-            text_args = font_kwargs
-            warnings.warn(
-                "The font_kwargs keyword is deprecated.  Please use "
-                "the text_args keyword instead."
-            )
-        if circle_args is None:
-            circle_args = def_circle_args
-        self.circle_args = circle_args
-        if text_args is None:
-            text_args = def_text_args
-        self.text_args = text_args
         self.factor = factor
+
+        if mpl_kwargs is None:
+            mpl_kwargs = {"edgecolor": "white", "facecolor": "None"}
+
+        depr_message = "keyword `{}` is deprecated, use `{}` instead."
+        if circle_args is not None:
+            issue_deprecation_warning(depr_message.format("circle_args", "mpl_kwargs"))
+            mpl_kwargs.update(circle_args)
+        if circle_kwargs is not None:
+            issue_deprecation_warning(
+                depr_message.format("circle_kwargs", "mpl_kwargs")
+            )
+            mpl_kwargs.update(circle_kwargs)
+
+        if text_kwargs is None:
+            text_kwargs = {"color": "white"}
+        if font_kwargs is not None:
+            issue_deprecation_warning(depr_message.format("font_kwargs", "text_kwargs"))
+            text_kwargs.update(font_kwargs)
+        if text_args is not None:
+            issue_deprecation_warning(depr_message.format("text_args", "text_kwargs"))
+            text_kwargs.update(text_args)
+
+        # TODO: rename thos attributes (minimal: args -> kwargs)
+        self.circle_args = mpl_kwargs
+        self.text_args = text_kwargs
 
     def __call__(self, plot):
         from matplotlib.patches import Circle

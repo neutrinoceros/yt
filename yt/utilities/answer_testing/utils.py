@@ -474,7 +474,7 @@ def _create_plot_window_attribute_plot(ds, ptype, field, axis, pkwargs=None):
 
 
 def _create_phase_plot_attribute_plot(
-    data_source, x_field, y_field, z_field, plot_type, plot_kwargs=None
+    data_source, x_field, y_field, z_field, plot_type, mpl_kwargs=None
 ):
     r"""
     Convenience function used in phase_plot_attribute_test.
@@ -496,7 +496,7 @@ def _create_phase_plot_attribute_plot(
     plot_type : string
         Type of plot to make (e.g., SlicePlot).
 
-    plot_kwargs : dict
+    mpl_kwargs : dict
         Any keywords to be passed when creating the plot.
     """
     if plot_type is None:
@@ -504,5 +504,5 @@ def _create_phase_plot_attribute_plot(
     cls = getattr(profile_plotter, plot_type, None)
     if cls is None:
         cls = getattr(particle_plots, plot_type)
-    plot = cls(*(data_source, x_field, y_field, z_field), **plot_kwargs)
+    plot = cls(*(data_source, x_field, y_field, z_field), **mpl_kwargs)
     return plot
