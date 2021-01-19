@@ -32,6 +32,17 @@ from yt.visualization.image_writer import apply_colormap
 callback_registry = {}
 
 
+def handle_kwarg_deprecation_warning(old, new, namespace):
+    # old and new should be str variable names
+    # namespace is normally supposed to be `locals()`
+    old = namespace[old]
+    new = namespace[new]
+    if old is not None:
+        new.update(old)
+    DEPR_KWARG_WARNING = "keyword `{}` is deprecated, use `{}` instead."
+    issue_deprecation_warning(DEPR_KWARG_WARNING.format(old, new))
+
+
 def _verify_geometry(func):
     @wraps(func)
     def _check_geometry(self, plot):
@@ -305,7 +316,13 @@ class VelocityCallback(PlotCallback):
     _supported_geometries = ("cartesian", "spectral_cube", "polar", "cylindrical")
 
     def __init__(
-        self, factor=16, scale=None, scale_units=None, normalize=False, mpl_kwargs=None
+        self,
+        factor=16,
+        scale=None,
+        scale_units=None,
+        normalize=False,
+        mpl_kwargs=None,
+        plot_args=None,
     ):
         PlotCallback.__init__(self)
         self.factor = factor
@@ -314,6 +331,7 @@ class VelocityCallback(PlotCallback):
         self.normalize = normalize
         if mpl_kwargs is None:
             mpl_kwargs = {}
+        handle_kwarg_deprecation_warning("plot_args", "mpl_kwargs", locals())
         self.mpl_kwargs = mpl_kwargs
 
     def __call__(self, plot):
@@ -390,7 +408,13 @@ class MagFieldCallback(PlotCallback):
     _supported_geometries = ("cartesian", "spectral_cube", "polar", "cylindrical")
 
     def __init__(
-        self, factor=16, scale=None, scale_units=None, normalize=False, mpl_kwargs=None
+        self,
+        factor=16,
+        scale=None,
+        scale_units=None,
+        normalize=False,
+        mpl_kwargs=None,
+        plot_args=None,
     ):
         PlotCallback.__init__(self)
         self.factor = factor
@@ -399,6 +423,7 @@ class MagFieldCallback(PlotCallback):
         self.normalize = normalize
         if mpl_kwargs is None:
             mpl_kwargs = {}
+        handle_kwarg_deprecation_warning("plot_args", "mpl_kwargs", locals())
         self.mpl_kwargs = mpl_kwargs
 
     def __call__(self, plot):
@@ -476,6 +501,7 @@ class QuiverCallback(PlotCallback):
         bv_x=0,
         bv_y=0,
         mpl_kwargs=None,
+        plot_args=None,
     ):
         PlotCallback.__init__(self)
         self.field_x = field_x
@@ -488,6 +514,7 @@ class QuiverCallback(PlotCallback):
         self.normalize = normalize
         if mpl_kwargs is None:
             mpl_kwargs = {}
+        handle_kwarg_deprecation_warning("plot_args", "mpl_kwargs", locals())
         self.mpl_kwargs = mpl_kwargs
 
     def __call__(self, plot):
@@ -584,9 +611,11 @@ class ContourCallback(PlotCallback):
         mpl_kwargs=None,
         label=False,
         take_log=None,
-        label_args=None,
+        label_args=None,  # deprecated
         text_kwargs=None,
         data_source=None,
+        plot_args=None,  # deprecated
+        text_args=None,  # deprecated
     ):
         PlotCallback.__init__(self)
         def_mpl_kwargs = {"colors": "k", "linestyles": "solid"}
@@ -598,16 +627,14 @@ class ContourCallback(PlotCallback):
         self.take_log = take_log
         if mpl_kwargs is None:
             mpl_kwargs = def_mpl_kwargs
+        handle_kwarg_deprecation_warning("plot_args", "mpl_kwargs", locals())
         self.mpl_kwargs = mpl_kwargs
         self.label = label
-        if label_args is not None:
-            text_kwargs = label_args
-            warnings.warn(
-                "The label_args keyword is deprecated.  Please use "
-                "the text_kwargs keyword instead."
-            )
+
         if text_kwargs is None:
             text_kwargs = def_text_kwargs
+        handle_kwarg_deprecation_warning("label_args", "text_kwargs", locals())
+        handle_kwarg_deprecation_warning("text_args", "text_kwargs", locals())
         self.text_kwargs = text_kwargs
         self.data_source = data_source
 
@@ -904,6 +931,7 @@ class StreamlineCallback(PlotCallback):
         field_color=None,
         display_threshold=None,
         mpl_kwargs=None,
+        plot_args=None,
     ):
         PlotCallback.__init__(self)
         def_mpl_kwargs = {}
@@ -915,6 +943,7 @@ class StreamlineCallback(PlotCallback):
         self.display_threshold = display_threshold
         if mpl_kwargs is None:
             mpl_kwargs = def_mpl_kwargs
+        handle_kwarg_deprecation_warning("plot_args", "mpl_kwargs", locals())
         self.mpl_kwargs = mpl_kwargs
 
     def __call__(self, plot):
@@ -1032,19 +1061,27 @@ class LinePlotCallback(PlotCallback):
     _type_name = "line"
     _supported_geometries = ("cartesian", "spectral_cube", "polar", "cylindrical")
 
-    def __init__(self, p1, p2, data_coords=False, coord_system="data", mpl_kwargs=None):
+    def __init__(
+        self,
+        p1,
+        p2,
+        data_coords=False,
+        coord_system="data",
+        mpl_kwargs=None,
+        plot_args=None,
+    ):
         PlotCallback.__init__(self)
-        def_mpl_kwargs = {"color": "white", "linewidth": 2}
         self.p1 = p1
         self.p2 = p2
         if mpl_kwargs is None:
-            mpl_kwargs = def_mpl_kwargs
+            mpl_kwargs = {"color": "white", "linewidth": 2}
+        handle_kwarg_deprecation_warning("plot_args", "mpl_kwargs", locals())
         self.mpl_kwargs = mpl_kwargs
         if data_coords:
             coord_system = "data"
-            warnings.warn(
-                "The data_coords keyword is deprecated.  Please set "
-                "the keyword coord_system='data' instead."
+            issue_deprecation_warning(
+                "`data_coords` keyword arguemnet is deprecated. "
+                "Please set `coord_system='data'` instead."
             )
         self.coord_system = coord_system
         self.transform = None
@@ -1072,11 +1109,11 @@ class ImageLineCallback(LinePlotCallback):
     _type_name = "image_line"
     _supported_geometries = ("cartesian", "spectral_cube", "cylindrical")
 
-    def __init__(self, p1, p2, data_coords=False, coord_system="axis", mpl_kwargs=None):
+    def __init__(self, p1, p2, data_coords=False, coord_system="axis", plot_args=None):
         super().__init__(
-            p1, p2, data_coords, coord_system, mpl_kwargs
+            p1, p2, data_coords, coord_system, mpl_kwargs=plot_args
         )
-        warnings.warn(
+        issue_deprecation_warning(
             "The ImageLineCallback (annotate_image_line()) is "
             "deprecated.  Please use the LinePlotCallback "
             "(annotate_line()) instead."
@@ -1110,6 +1147,7 @@ class CuttingQuiverCallback(PlotCallback):
         scale_units=None,
         normalize=False,
         mpl_kwargs=None,
+        plot_args=None,
     ):
         PlotCallback.__init__(self)
         self.field_x = field_x
@@ -1120,6 +1158,7 @@ class CuttingQuiverCallback(PlotCallback):
         self.normalize = normalize
         if mpl_kwargs is None:
             mpl_kwargs = {}
+        handle_kwarg_deprecation_warning("plot_args", "mpl_kwargs", locals())
         self.mpl_kwargs = mpl_kwargs
 
     def __call__(self, plot):
@@ -1194,10 +1233,11 @@ class ClumpContourCallback(PlotCallback):
     _type_name = "clumps"
     _supported_geometries = ("cartesian", "spectral_cube", "cylindrical")
 
-    def __init__(self, clumps, mpl_kwargs=None):
+    def __init__(self, clumps, mpl_kwargs=None, plot_args=None):
         self.clumps = clumps
         if mpl_kwargs is None:
             mpl_kwargs = {}
+        handle_kwarg_deprecation_warning("plot_args", "mpl_kwargs", locals())
         if "color" in mpl_kwargs:
             mpl_kwargs["colors"] = mpl_kwargs.pop("color")
         self.mpl_kwargs = mpl_kwargs
@@ -1345,6 +1385,7 @@ class ArrowCallback(PlotCallback):
         starting_pos=None,
         coord_system="data",
         mpl_kwargs=None,
+        plot_args=None,
     ):
         def_mpl_kwargs = {"color": "white"}
         self.pos = pos
@@ -1358,6 +1399,7 @@ class ArrowCallback(PlotCallback):
         self.transform = None
         if mpl_kwargs is None:
             mpl_kwargs = def_mpl_kwargs
+        handle_kwarg_deprecation_warning("plot_args", "mpl_kwargs", locals())
         self.mpl_kwargs = mpl_kwargs
 
     def __call__(self, plot):
@@ -1484,12 +1526,14 @@ class MarkerAnnotateCallback(PlotCallback):
     _type_name = "marker"
     _supported_geometries = ("cartesian", "spectral_cube", "polar", "cylindrical")
 
-    def __init__(self, pos, marker="x", coord_system="data", mpl_kwargs=None):
-        def_mpl_kwargs = {"color": "w", "s": 50}
+    def __init__(
+        self, pos, marker="x", coord_system="data", mpl_kwargs=None, plot_args=None
+    ):
         self.pos = pos
         self.marker = marker
         if mpl_kwargs is None:
-            mpl_kwargs = def_mpl_kwargs
+            mpl_kwargs = {"color": "w", "s": 50}
+        handle_kwarg_deprecation_warning("plot_args", "mpl_kwargs", locals())
         self.mpl_kwargs = mpl_kwargs
         self.coord_system = coord_system
         self.transform = None
@@ -1566,6 +1610,7 @@ class SphereCallback(PlotCallback):
         text=None,
         coord_system="data",
         text_kwargs=None,
+        circle_args=None,
     ):
         def_text_kwargs = {"color": "white"}
         def_mpl_kwargs = {"color": "white"}
@@ -1573,6 +1618,8 @@ class SphereCallback(PlotCallback):
         self.radius = radius
         if mpl_kwargs is None:
             mpl_kwargs = def_mpl_kwargs
+        handle_kwarg_deprecation_warning("circle_args", "mpl_kwargs", locals())
+
         if "fill" not in mpl_kwargs:
             mpl_kwargs["fill"] = False
         self.mpl_kwargs = mpl_kwargs
@@ -1899,26 +1946,14 @@ class HaloCatalogCallback(PlotCallback):
         if mpl_kwargs is None:
             mpl_kwargs = {"edgecolor": "white", "facecolor": "None"}
 
-        depr_message = "keyword `{}` is deprecated, use `{}` instead."
-        if mpl_kwargs is not None:
-            issue_deprecation_warning(depr_message.format("mpl_kwargs", "mpl_kwargs"))
-            mpl_kwargs.update(mpl_kwargs)
-        if circle_kwargs is not None:
-            issue_deprecation_warning(
-                depr_message.format("circle_kwargs", "mpl_kwargs")
-            )
-            mpl_kwargs.update(circle_kwargs)
+        handle_kwarg_deprecation_warning("circle_args", "mpl_kwargs", locals())
+        handle_kwarg_deprecation_warning("circle_kwargs", "mpl_kwargs", locals())
 
         if text_kwargs is None:
             text_kwargs = {"color": "white"}
-        if font_kwargs is not None:
-            issue_deprecation_warning(depr_message.format("font_kwargs", "text_kwargs"))
-            text_kwargs.update(font_kwargs)
-        if text_kwargs is not None:
-            issue_deprecation_warning(depr_message.format("text_kwargs", "text_kwargs"))
-            text_kwargs.update(text_kwargs)
+        handle_kwarg_deprecation_warning("text_args", "text_kwargs", locals())
+        handle_kwarg_deprecation_warning("font_kwargs", "text_kwargs", locals())
 
-        # TODO: rename thos attributes (minimal: args -> kwargs)
         self.mpl_kwargs = mpl_kwargs
         self.text_kwargs = text_kwargs
 
@@ -2201,8 +2236,9 @@ class MeshLinesCallback(PlotCallback):
     _type_name = "mesh_lines"
     _supported_geometries = ("cartesian", "spectral_cube")
 
-    def __init__(self, mpl_kwargs=None):
+    def __init__(self, mpl_kwargs=None, plot_args=None):
         super().__init__()
+        handle_kwarg_deprecation_warning("plot_args", "mpl_kwargs", locals())
         self.mpl_kwargs = mpl_kwargs
 
     def promote_2d_to_3d(self, coords, indices, plot):
@@ -2268,9 +2304,11 @@ class TriangleFacetsCallback(PlotCallback):
     _type_name = "triangle_facets"
     _supported_geometries = ("cartesian", "spectral_cube")
 
-    def __init__(self, triangle_vertices, mpl_kwargs=None):
+    def __init__(self, triangle_vertices, mpl_kwargs=None, plot_args=None):
         super().__init__()
+
         self.mpl_kwargs = {} if mpl_kwargs is None else mpl_kwargs
+        handle_kwarg_deprecation_warning("plot_args", "mpl_kwargs", locals())
         self.vertices = triangle_vertices
 
     def __call__(self, plot):
@@ -2405,6 +2443,8 @@ class TimestampCallback(PlotCallback):
         time_offset=None,
         text_kwargs=None,
         inset_box_kwargs=None,
+        text_args=None,
+        inset_box_args=None,
     ):
 
         def_text_kwargs = {
@@ -2432,9 +2472,13 @@ class TimestampCallback(PlotCallback):
         self.time_offset = time_offset
         if text_kwargs is None:
             text_kwargs = def_text_kwargs
+
+        handle_kwarg_deprecation_warning("text_args", "text_kwargs", locals())
         self.text_kwargs = text_kwargs
+
         if inset_box_kwargs is None:
             inset_box_kwargs = def_inset_box_kwargs
+        handle_kwarg_deprecation_warning("inset_box_args", "inset_box_kwargs", locals())
         self.inset_box_kwargs = inset_box_kwargs
 
         # if inset box is not desired, set inset_box_kwargs to {}
@@ -2645,18 +2689,10 @@ class ScaleCallback(PlotCallback):
         draw_inset_box=False,
         inset_box_kwargs=None,
         scale_text_format="{scale} {units}",
+        text_args=None,  # deprecated
+        inset_box_args=None,  # deprecated
+        size_bar_args=None,  # deprecated
     ):
-
-        def_size_bar_kwargs = {"pad": 0.05, "sep": 5, "borderpad": 1, "color": "w"}
-
-        def_inset_box_kwargs = {
-            "facecolor": "black",
-            "linewidth": 3,
-            "edgecolor": "white",
-            "alpha": 0.5,
-            "boxstyle": "square",
-        }
-
         # Set position based on corner argument.
         self.corner = corner
         self.coeff = coeff
@@ -2666,17 +2702,27 @@ class ScaleCallback(PlotCallback):
         self.min_frac = min_frac
         self.coord_system = coord_system
         self.scale_text_format = scale_text_format
+
         if size_bar_kwargs is None:
-            self.size_bar_kwargs = def_size_bar_kwargs
-        else:
-            self.size_bar_kwargs = size_bar_kwargs
+            size_bar_kwargs = {"pad": 0.05, "sep": 5, "borderpad": 1, "color": "w"}
+        handle_kwarg_deprecation_warning("size_bar_args", "size_bar_kwargs", locals())
+        self.size_bar_kwargs = size_bar_kwargs
+
         if inset_box_kwargs is None:
-            self.inset_box_kwargs = def_inset_box_kwargs
-        else:
-            self.inset_box_kwargs = inset_box_kwargs
+            inset_box_kwargs = {
+                "facecolor": "black",
+                "linewidth": 3,
+                "edgecolor": "white",
+                "alpha": 0.5,
+                "boxstyle": "square",
+            }
+        handle_kwarg_deprecation_warning("inset_box_args", "inset_box_kwargs", locals())
+        self.inset_box_kwargs = inset_box_kwargs
+
         self.draw_inset_box = draw_inset_box
         if text_kwargs is None:
             text_kwargs = {}
+        handle_kwarg_deprecation_warning("text_args", "text_kwargs", locals())
         self.text_kwargs = text_kwargs
 
     def __call__(self, plot):
@@ -2829,13 +2875,14 @@ class RayCallback(PlotCallback):
     _type_name = "ray"
     _supported_geometries = ("cartesian", "spectral_cube", "force")
 
-    def __init__(self, ray, arrow=False, mpl_kwargs=None):
+    def __init__(self, ray, arrow=False, mpl_kwargs=None, plot_args=None):
         PlotCallback.__init__(self)
         def_mpl_kwargs = {"color": "white", "linewidth": 2}
         self.ray = ray
         self.arrow = arrow
         if mpl_kwargs is None:
             mpl_kwargs = def_mpl_kwargs
+        handle_kwarg_deprecation_warning("plot_args", "mpl_kwargs", locals())
         self.mpl_kwargs = mpl_kwargs
 
     def _process_ray(self):
