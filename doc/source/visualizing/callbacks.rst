@@ -82,7 +82,7 @@ of the x-plane (i.e. with axes in the y and z directions):
     s.annotate_marker((0.1, 0.2), coord_system='figure',
                     mpl_kwargs={'color':'black'})
     s.annotate_text((0.1, 0.2), 'figure: (0.1, 0.2)', coord_system='figure',
-                    text_args={'color':'black'})
+                    text_kwargs={'color':'black'})
     s.save()
 
 Note that for non-cartesian geometries and ``coord_system="data"``, the coordinates
@@ -233,7 +233,7 @@ Overplot Contours
 
 .. function:: annotate_contour(self, field, ncont=5, factor=4, take_log=False,\
                                clim=None, mpl_kwargs=None, label=False, \
-                               text_args=None, data_source=None)
+                               text_kwargs=None, data_source=None)
 
    (This is a proxy for
    :class:`~yt.visualization.plot_modifications.ContourCallback`.)
@@ -373,7 +373,7 @@ Overplot Halo Annotations
                              width=None, annotate_field=None, \
                              radius_field='virial_radius', \
                              center_field_prefix="particle_position", \
-                             text_args=None, factor=1.0)
+                             text_kwargs=None, factor=1.0)
 
    (This is a proxy for
    :class:`~yt.visualization.plot_modifications.HaloCatalogCallback`.)
@@ -538,7 +538,7 @@ Overplot a Circle on a Plot
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. function:: annotate_sphere(self, center, radius, mpl_kwargs=None, \
-                              coord_system='data', text=None, text_args=None)
+                              coord_system='data', text=None, text_kwargs=None)
 
     (This is a proxy for
     :class:`~yt.visualization.plot_modifications.SphereCallback`.)
@@ -616,13 +616,13 @@ Overplot Text
 ~~~~~~~~~~~~~
 
 .. function:: annotate_text(self, pos, text, coord_system='data', \
-                            text_args=None, inset_box_args=None)
+                            text_kwargs=None, inset_box_kwargs=None)
 
     (This is a proxy for
     :class:`~yt.visualization.plot_modifications.TextLabelCallback`.)
 
     Overplot text on the plot at a specified position. If you desire an inset
-    box around your text, set one with the inset_box_args dictionary
+    box around your text, set one with the inset_box_kwargs dictionary
     keyword.
 
 .. python-script::
@@ -691,7 +691,7 @@ Add the Current Time and/or Redshift
                                  time_unit=None, time_offset=None, \
                                  redshift_format='z = {redshift:.2f}', \
                                  draw_inset_box=False, coord_system='axis', \
-                                 text_args=None, inset_box_args=None)
+                                 text_kwargs=None, inset_box_kwargs=None)
 
    (This is a proxy for
    :class:`~yt.visualization.plot_modifications.TimestampCallback`.)
@@ -721,9 +721,9 @@ Add a Physical Scale Bar
                              unit=None, pos=None,
                              scale_text_format="{scale} {units}", \
                              max_frac=0.16, min_frac=0.015, \
-                             coord_system='axis', text_args=None, \
+                             coord_system='axis', text_kwargs=None, \
                              size_bar_args=None, draw_inset_box=False, \
-                             inset_box_args=None)
+                             inset_box_kwargs=None)
 
    (This is a proxy for
    :class:`~yt.visualization.plot_modifications.ScaleCallback`.)
@@ -735,7 +735,7 @@ Add a Physical Scale Bar
     specified, an appropriate pair will be determined such that your scale bar
     is never smaller than min_frac or greater than max_frac of your plottable
     axis length.  Additional customization of the scale bar is possible by
-    adjusting the text_args and size_bar_args dictionaries.  The text_args
+    adjusting the text_kwargs and size_bar_args dictionaries.  The text_kwargs
     dictionary accepts matplotlib's font_properties arguments to override
     the default font_properties for the current plot.  The size_bar_args
     dictionary accepts keyword arguments for the AnchoredSizeBar class in

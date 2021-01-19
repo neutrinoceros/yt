@@ -1200,7 +1200,7 @@ Minor enhancements and bugfixes
   get_sph_phi(), etc.
 * Fixed issues involving invalid FRBs when uses called _setup_plots in their
   scripts
-* Added a ``text_args`` keyword to ``annotate_scale()`` callback
+* Added a ``text_kwargs`` keyword to ``annotate_scale()`` callback
 * Added a print_stats function for RAMSES
 * Fixed a number of bugs in the Photon Simulator
 * Added support for particle fields to the [Min,Max]Location derived quantities

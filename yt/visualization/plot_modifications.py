@@ -585,12 +585,12 @@ class ContourCallback(PlotCallback):
         label=False,
         take_log=None,
         label_args=None,
-        text_args=None,
+        text_kwargs=None,
         data_source=None,
     ):
         PlotCallback.__init__(self)
         def_mpl_kwargs = {"colors": "k", "linestyles": "solid"}
-        def_text_args = {"colors": "w"}
+        def_text_kwargs = {"colors": "w"}
         self.ncont = ncont
         self.field = field
         self.factor = factor
@@ -601,14 +601,14 @@ class ContourCallback(PlotCallback):
         self.mpl_kwargs = mpl_kwargs
         self.label = label
         if label_args is not None:
-            text_args = label_args
+            text_kwargs = label_args
             warnings.warn(
                 "The label_args keyword is deprecated.  Please use "
-                "the text_args keyword instead."
+                "the text_kwargs keyword instead."
             )
-        if text_args is None:
-            text_args = def_text_args
-        self.text_args = text_args
+        if text_kwargs is None:
+            text_kwargs = def_text_kwargs
+        self.text_kwargs = text_kwargs
         self.data_source = data_source
 
     def __call__(self, plot):
@@ -696,7 +696,7 @@ class ContourCallback(PlotCallback):
         plot._axes.set_ylim(yy0, yy1)
 
         if self.label:
-            plot._axes.clabel(cset, **self.text_args)
+            plot._axes.clabel(cset, **self.text_kwargs)
 
 
 class GridBoundaryCallback(PlotCallback):
@@ -1539,7 +1539,7 @@ class SphereCallback(PlotCallback):
     text : string, optional
         Optional text to include next to the circle.
 
-    text_args : dictionary, optional
+    text_kwargs : dictionary, optional
         This dictionary is passed to the MPL text function. By default,
         it is: {'color':'white'}
 
@@ -1565,9 +1565,9 @@ class SphereCallback(PlotCallback):
         mpl_kwargs=None,
         text=None,
         coord_system="data",
-        text_args=None,
+        text_kwargs=None,
     ):
-        def_text_args = {"color": "white"}
+        def_text_kwargs = {"color": "white"}
         def_mpl_kwargs = {"color": "white"}
         self.center = center
         self.radius = radius
@@ -1577,9 +1577,9 @@ class SphereCallback(PlotCallback):
             mpl_kwargs["fill"] = False
         self.mpl_kwargs = mpl_kwargs
         self.text = text
-        if text_args is None:
-            text_args = def_text_args
-        self.text_args = text_args
+        if text_kwargs is None:
+            text_kwargs = def_text_kwargs
+        self.text_kwargs = text_kwargs
         self.coord_system = coord_system
         self.transform = None
 
@@ -1615,9 +1615,9 @@ class SphereCallback(PlotCallback):
         plot._axes.add_patch(cir)
         if self.text is not None:
             label = plot._axes.text(
-                x, y, self.text, transform=self.transform, **self.text_args
+                x, y, self.text, transform=self.transform, **self.text_kwargs
             )
-            self._set_font_properties(plot, [label], **self.text_args)
+            self._set_font_properties(plot, [label], **self.text_kwargs)
 
         plot._axes.set_xlim(xx0, xx1)
         plot._axes.set_ylim(yy0, yy1)
@@ -1626,7 +1626,7 @@ class SphereCallback(PlotCallback):
 class TextLabelCallback(PlotCallback):
     """
     Overplot text on the plot at a specified position. If you desire an inset
-    box around your text, set one with the inset_box_args dictionary
+    box around your text, set one with the inset_box_kwargs dictionary
     keyword.
 
     Parameters
@@ -1651,12 +1651,12 @@ class TextLabelCallback(PlotCallback):
             "figure" -- the MPL figure coordinates: (0,0) is lower left, (1,1)
                         is upper right
 
-    text_args : dictionary, optional
+    text_kwargs : dictionary, optional
         This dictionary is passed to the MPL text function for generating
         the text.  By default, it is: {'color':'white'} and uses the defaults
         for the other fonts in the image.
 
-    inset_box_args : dictionary, optional
+    inset_box_kwargs : dictionary, optional
         A dictionary of any arbitrary parameters to be passed to the Matplotlib
         FancyBboxPatch object as the inset box around the text.  Default: {}
 
@@ -1676,8 +1676,8 @@ class TextLabelCallback(PlotCallback):
     >>> ds = yt.load('IsolatedGalaxy/galaxy0030/galaxy0030')
     >>> s = yt.SlicePlot(ds, 'z', 'density')
     >>> s.annotate_text([0.2, 0.8], "Here is a galaxy", coord_system='axis',
-    ...                 text_args={'color':'yellow'},
-    ...                 inset_box_args={'boxstyle':'square,pad=0.3',
+    ...                 text_kwargs={'color':'yellow'},
+    ...                 inset_box_kwargs={'boxstyle':'square,pad=0.3',
     ...                                 'facecolor':'black',
     ...                                 'linewidth':3,
     ...                                 'edgecolor':'white', 'alpha':0.5})
@@ -1693,10 +1693,10 @@ class TextLabelCallback(PlotCallback):
         text,
         data_coords=False,
         coord_system="data",
-        text_args=None,
-        inset_box_args=None,
+        text_kwargs=None,
+        inset_box_kwargs=None,
     ):
-        def_text_args = {"color": "white"}
+        def_text_kwargs = {"color": "white"}
         self.pos = pos
         self.text = text
         if data_coords:
@@ -1705,15 +1705,15 @@ class TextLabelCallback(PlotCallback):
                 "The data_coords keyword is deprecated.  Please set "
                 "the keyword coord_system='data' instead."
             )
-        if text_args is None:
-            text_args = def_text_args
-        self.text_args = text_args
-        self.inset_box_args = inset_box_args
+        if text_kwargs is None:
+            text_kwargs = def_text_kwargs
+        self.text_kwargs = text_kwargs
+        self.inset_box_kwargs = inset_box_kwargs
         self.coord_system = coord_system
         self.transform = None
 
     def __call__(self, plot):
-        kwargs = self.text_args.copy()
+        kwargs = self.text_kwargs.copy()
         x, y = self._sanitize_coord_system(
             plot, self.pos, coord_system=self.coord_system
         )
@@ -1721,8 +1721,8 @@ class TextLabelCallback(PlotCallback):
         # Set the font properties of text from this callback to be
         # consistent with other text labels in this figure
         xx0, xx1, yy0, yy1 = self._plot_bounds(plot)
-        if self.inset_box_args is not None:
-            kwargs["bbox"] = self.inset_box_args
+        if self.inset_box_kwargs is not None:
+            kwargs["bbox"] = self.inset_box_kwargs
         label = plot._axes.text(x, y, self.text, transform=self.transform, **kwargs)
         self._set_font_properties(plot, [label], **kwargs)
         plot._axes.set_xlim(xx0, xx1)
@@ -1746,11 +1746,11 @@ class PointAnnotateCallback(TextLabelCallback):
         text,
         data_coords=False,
         coord_system="data",
-        text_args=None,
-        inset_box_args=None,
+        text_kwargs=None,
+        inset_box_kwargs=None,
     ):
         super().__init__(
-            pos, text, data_coords, coord_system, text_args, inset_box_args
+            pos, text, data_coords, coord_system, text_kwargs, inset_box_kwargs
         )
         warnings.warn(
             "The PointAnnotateCallback (annotate_point()) is "
@@ -1803,7 +1803,7 @@ class HaloCatalogCallback(PlotCallback):
         will result in the fields 'particle_position_x' for x
         'particle_position_y' for y, and 'particle_position_z'
         for z. Default: 'particle_position'.
-    text_args : dict
+    text_kwargs : dict
         Contains the arguments controlling the text
         appearance of the annotated field.
     factor : float
@@ -1914,13 +1914,13 @@ class HaloCatalogCallback(PlotCallback):
         if font_kwargs is not None:
             issue_deprecation_warning(depr_message.format("font_kwargs", "text_kwargs"))
             text_kwargs.update(font_kwargs)
-        if text_args is not None:
-            issue_deprecation_warning(depr_message.format("text_args", "text_kwargs"))
-            text_kwargs.update(text_args)
+        if text_kwargs is not None:
+            issue_deprecation_warning(depr_message.format("text_kwargs", "text_kwargs"))
+            text_kwargs.update(text_kwargs)
 
         # TODO: rename thos attributes (minimal: args -> kwargs)
         self.mpl_kwargs = mpl_kwargs
-        self.text_args = text_kwargs
+        self.text_kwargs = text_kwargs
 
     def __call__(self, plot):
         from matplotlib.patches import Circle
@@ -1995,11 +1995,11 @@ class HaloCatalogCallback(PlotCallback):
             texts = [f"{float(dat):g}" for dat in annotate_dat]
             labels = []
             for pos_x, pos_y, t in zip(px, py, texts):
-                labels.append(plot._axes.text(pos_x, pos_y, t, **self.text_args))
+                labels.append(plot._axes.text(pos_x, pos_y, t, **self.text_kwargs))
 
             # Set the font properties of text from this callback to be
             # consistent with other text labels in this figure
-            self._set_font_properties(plot, labels, **self.text_args)
+            self._set_font_properties(plot, labels, **self.text_kwargs)
 
 
 class ParticleCallback(PlotCallback):
@@ -2349,7 +2349,7 @@ class TimestampCallback(PlotCallback):
 
     draw_inset_box : boolean, optional
         Whether or not an inset box should be included around the text
-        If so, it uses the inset_box_args to set the matplotlib FancyBboxPatch
+        If so, it uses the inset_box_kwargs to set the matplotlib FancyBboxPatch
         object.
 
     coord_system : string, optional
@@ -2367,12 +2367,12 @@ class TimestampCallback(PlotCallback):
         passed in, the value of the *time_unit* kwarg is used for the
         units. Default: None, meaning no offset.
 
-    text_args : dictionary, optional
+    text_kwargs : dictionary, optional
         A dictionary of any arbitrary parameters to be passed to the Matplotlib
         text object.  Defaults: ``{'color':'white',
         'horizontalalignment':'center', 'verticalalignment':'top'}``.
 
-    inset_box_args : dictionary, optional
+    inset_box_kwargs : dictionary, optional
         A dictionary of any arbitrary parameters to be passed to the Matplotlib
         FancyBboxPatch object as the inset box around the text.
         Defaults: ``{'boxstyle':'square', 'pad':0.3, 'facecolor':'black',
@@ -2403,16 +2403,16 @@ class TimestampCallback(PlotCallback):
         draw_inset_box=False,
         coord_system="axis",
         time_offset=None,
-        text_args=None,
-        inset_box_args=None,
+        text_kwargs=None,
+        inset_box_kwargs=None,
     ):
 
-        def_text_args = {
+        def_text_kwargs = {
             "color": "white",
             "horizontalalignment": "center",
             "verticalalignment": "top",
         }
-        def_inset_box_args = {
+        def_inset_box_kwargs = {
             "boxstyle": "square,pad=0.3",
             "facecolor": "black",
             "linewidth": 3,
@@ -2430,40 +2430,40 @@ class TimestampCallback(PlotCallback):
         self.time_unit = time_unit
         self.coord_system = coord_system
         self.time_offset = time_offset
-        if text_args is None:
-            text_args = def_text_args
-        self.text_args = text_args
-        if inset_box_args is None:
-            inset_box_args = def_inset_box_args
-        self.inset_box_args = inset_box_args
+        if text_kwargs is None:
+            text_kwargs = def_text_kwargs
+        self.text_kwargs = text_kwargs
+        if inset_box_kwargs is None:
+            inset_box_kwargs = def_inset_box_kwargs
+        self.inset_box_kwargs = inset_box_kwargs
 
-        # if inset box is not desired, set inset_box_args to {}
+        # if inset box is not desired, set inset_box_kwargs to {}
         if not draw_inset_box:
-            self.inset_box_args = None
+            self.inset_box_kwargs = None
 
     def __call__(self, plot):
         # Setting pos overrides corner argument
         if self.pos[0] is None or self.pos[1] is None:
             if self.corner == "upper_left":
                 self.pos = (0.03, 0.96)
-                self.text_args["horizontalalignment"] = "left"
-                self.text_args["verticalalignment"] = "top"
+                self.text_kwargs["horizontalalignment"] = "left"
+                self.text_kwargs["verticalalignment"] = "top"
             elif self.corner == "upper_right":
                 self.pos = (0.97, 0.96)
-                self.text_args["horizontalalignment"] = "right"
-                self.text_args["verticalalignment"] = "top"
+                self.text_kwargs["horizontalalignment"] = "right"
+                self.text_kwargs["verticalalignment"] = "top"
             elif self.corner == "lower_left":
                 self.pos = (0.03, 0.03)
-                self.text_args["horizontalalignment"] = "left"
-                self.text_args["verticalalignment"] = "bottom"
+                self.text_kwargs["horizontalalignment"] = "left"
+                self.text_kwargs["verticalalignment"] = "bottom"
             elif self.corner == "lower_right":
                 self.pos = (0.97, 0.03)
-                self.text_args["horizontalalignment"] = "right"
-                self.text_args["verticalalignment"] = "bottom"
+                self.text_kwargs["horizontalalignment"] = "right"
+                self.text_kwargs["verticalalignment"] = "bottom"
             elif self.corner is None:
                 self.pos = (0.5, 0.5)
-                self.text_args["horizontalalignment"] = "center"
-                self.text_args["verticalalignment"] = "center"
+                self.text_kwargs["horizontalalignment"] = "center"
+                self.text_kwargs["verticalalignment"] = "center"
             else:
                 raise ValueError(
                     "Argument 'corner' must be set to "
@@ -2531,8 +2531,8 @@ class TimestampCallback(PlotCallback):
             self.pos,
             self.text,
             coord_system=self.coord_system,
-            text_args=self.text_args,
-            inset_box_args=self.inset_box_args,
+            text_kwargs=self.text_kwargs,
+            inset_box_kwargs=self.inset_box_kwargs,
         )
         return tcb(plot)
 
@@ -2546,7 +2546,7 @@ class ScaleCallback(PlotCallback):
     specified, an appropriate pair will be determined such that your scale bar
     is never smaller than min_frac or greater than max_frac of your plottable
     axis length.  Additional customization of the scale bar is possible by
-    adjusting the text_args and size_bar_args dictionaries.  The text_args
+    adjusting the text_kwargs and size_bar_args dictionaries.  The text_kwargs
     dictionary accepts matplotlib's font_properties arguments to override
     the default font_properties for the current plot.  The size_bar_args
     dictionary accepts keyword arguments for the AnchoredSizeBar class in
@@ -2592,11 +2592,11 @@ class ScaleCallback(PlotCallback):
         - "axis": MPL axis coordinates: (0,0) is lower left; (1,1) is upper right
         - "figure": MPL figure coordinates: (0,0) is lower left, (1,1) is upper right
 
-    text_args : dictionary, optional
+    text_kwargs : dictionary, optional
         A dictionary of parameters to used to update the font_properties
         for the text in this callback.  For any property not set, it will
         use the defaults of the plot.  Thus one can modify the text size with:
-        ``text_args={'size':24}``
+        ``text_kwargs={'size':24}``
 
     size_bar_args : dictionary, optional
         A dictionary of parameters to be passed to the Matplotlib
@@ -2606,7 +2606,7 @@ class ScaleCallback(PlotCallback):
     draw_inset_box : boolean, optional
         Whether or not an inset box should be included around the scale bar.
 
-    inset_box_args : dictionary, optional
+    inset_box_kwargs : dictionary, optional
         A dictionary of keyword arguments to be passed to the matplotlib Patch
         object that represents the inset box.
         Defaults: ``{'facecolor': 'black', 'linewidth': 3,
@@ -2640,16 +2640,16 @@ class ScaleCallback(PlotCallback):
         max_frac=0.16,
         min_frac=0.015,
         coord_system="axis",
-        text_args=None,
+        text_kwargs=None,
         size_bar_args=None,
         draw_inset_box=False,
-        inset_box_args=None,
+        inset_box_kwargs=None,
         scale_text_format="{scale} {units}",
     ):
 
         def_size_bar_args = {"pad": 0.05, "sep": 5, "borderpad": 1, "color": "w"}
 
-        def_inset_box_args = {
+        def_inset_box_kwargs = {
             "facecolor": "black",
             "linewidth": 3,
             "edgecolor": "white",
@@ -2670,14 +2670,14 @@ class ScaleCallback(PlotCallback):
             self.size_bar_args = def_size_bar_args
         else:
             self.size_bar_args = size_bar_args
-        if inset_box_args is None:
-            self.inset_box_args = def_inset_box_args
+        if inset_box_kwargs is None:
+            self.inset_box_kwargs = def_inset_box_kwargs
         else:
-            self.inset_box_args = inset_box_args
+            self.inset_box_kwargs = inset_box_kwargs
         self.draw_inset_box = draw_inset_box
-        if text_args is None:
-            text_args = {}
-        self.text_args = text_args
+        if text_kwargs is None:
+            text_kwargs = {}
+        self.text_kwargs = text_kwargs
 
     def __call__(self, plot):
         from mpl_toolkits.axes_grid1.anchored_artists import AnchoredSizeBar
@@ -2739,13 +2739,13 @@ class ScaleCallback(PlotCallback):
         )
         frameon = self.size_bar_args.pop("frameon", self.draw_inset_box)
         # FontProperties instances use set_<property>() setter functions
-        for key, val in self.text_args.items():
+        for key, val in self.text_kwargs.items():
             setter_func = "set_" + key
             try:
                 getattr(fontproperties, setter_func)(val)
             except AttributeError as e:
                 raise AttributeError(
-                    "Cannot set text_args keyword "
+                    "Cannot set text_kwargs keyword "
                     "to include '%s' because MPL's fontproperties object does "
                     "not contain function '%s'." % (key, setter_func)
                 ) from e
@@ -2766,7 +2766,7 @@ class ScaleCallback(PlotCallback):
             **self.size_bar_args,
         )
 
-        bar.patch.set(**self.inset_box_args)
+        bar.patch.set(**self.inset_box_kwargs)
 
         plot._axes.add_artist(bar)
 
