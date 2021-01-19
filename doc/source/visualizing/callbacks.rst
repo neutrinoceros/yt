@@ -80,7 +80,7 @@ of the x-plane (i.e. with axes in the y and z directions):
     # Plot marker and text in figure coords
     # N.B. marker will not render outside of axis bounds
     s.annotate_marker((0.1, 0.2), coord_system='figure',
-                    plot_args={'color':'black'})
+                    mpl_kwargs={'color':'black'})
     s.annotate_text((0.1, 0.2), 'figure: (0.1, 0.2)', coord_system='figure',
                     text_args={'color':'black'})
     s.save()
@@ -172,7 +172,7 @@ Overplot Arrow
 ~~~~~~~~~~~~~~
 
 .. function:: annotate_arrow(self, pos, length=0.03, coord_system='data', \
-                             plot_args=None)
+                             mpl_kwargs=None)
 
    (This is a proxy for
    :class:`~yt.visualization.plot_modifications.ArrowCallback`.)
@@ -186,7 +186,7 @@ Overplot Arrow
    import yt
    ds = yt.load("IsolatedGalaxy/galaxy0030/galaxy0030")
    slc = yt.SlicePlot(ds, 'z', 'density', width=(10,'kpc'), center='c')
-   slc.annotate_arrow((0.5, 0.5, 0.5), length=0.06, plot_args={'color':'blue'})
+   slc.annotate_arrow((0.5, 0.5, 0.5), length=0.06, mpl_kwargs={'color':'blue'})
    slc.save()
 
 .. _annotate-clumps:
@@ -194,7 +194,7 @@ Overplot Arrow
 Clump Finder Callback
 ~~~~~~~~~~~~~~~~~~~~~
 
-.. function:: annotate_clumps(self, clumps, plot_args=None)
+.. function:: annotate_clumps(self, clumps, mpl_kwargs=None)
 
    (This is a proxy for
    :class:`~yt.visualization.plot_modifications.ClumpContourCallback`.)
@@ -232,7 +232,7 @@ Overplot Contours
 ~~~~~~~~~~~~~~~~~
 
 .. function:: annotate_contour(self, field, ncont=5, factor=4, take_log=False,\
-                               clim=None, plot_args=None, label=False, \
+                               clim=None, mpl_kwargs=None, label=False, \
                                text_args=None, data_source=None)
 
    (This is a proxy for
@@ -260,7 +260,7 @@ Axis-Aligned Data Sources
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. function:: annotate_quiver(self, field_x, field_y, factor=16, scale=None, \
-                              scale_units=None, normalize=False, plot_args=None)
+                              scale_units=None, normalize=False, mpl_kwargs=None)
 
    (This is a proxy for
    :class:`~yt.visualization.plot_modifications.QuiverCallback`.)
@@ -271,7 +271,7 @@ Axis-Aligned Data Sources
    ``scale_units``. If ``normalize`` is ``True``, the fields will be scaled by
    their local (in-plane) length, allowing morphological features to be more
    clearly seen for fields with substantial variation in field strength.
-   Additional arguments can be passed to the ``plot_args`` dictionary, see
+   Additional arguments can be passed to the ``mpl_kwargs`` dictionary, see
    matplotlib.axes.Axes.quiver for more info.
 
 .. python-script::
@@ -281,14 +281,14 @@ Axis-Aligned Data Sources
    p = yt.ProjectionPlot(ds, 'z', 'density', center=[0.5, 0.5, 0.5],
                          weight_field='density', width=(20, 'kpc'))
    p.annotate_quiver('velocity_x', 'velocity_y', factor=16,
-                     plot_args={"color": "purple"})
+                     mpl_kwargs={"color": "purple"})
    p.save()
 
 Off-Axis Data Sources
 ^^^^^^^^^^^^^^^^^^^^^
 
 .. function:: annotate_cquiver(self, field_x, field_y, factor=16, scale=None, \
-                               scale_units=None, normalize=False, plot_args=None)
+                               scale_units=None, normalize=False, mpl_kwargs=None)
 
    (This is a proxy for
    :class:`~yt.visualization.plot_modifications.CuttingQuiverCallback`.)
@@ -299,7 +299,7 @@ Off-Axis Data Sources
    ``scale_units``. If ``normalize`` is ``True``, the fields will be scaled by
    their local (in-plane) length, allowing morphological features to be more
    clearly seen for fields with substantial variation in field strength.
-   Additional arguments can be passed to the ``plot_args`` dictionary, see
+   Additional arguments can be passed to the ``mpl_kwargs`` dictionary, see
    matplotlib.axes.Axes.quiver for more info.
 
 .. python-script::
@@ -308,7 +308,7 @@ Off-Axis Data Sources
    ds = yt.load("Enzo_64/DD0043/data0043")
    s = yt.OffAxisSlicePlot(ds, [1,1,0], ["density"], center="c")
    s.annotate_cquiver('cutting_plane_velocity_x', 'cutting_plane_velocity_y',
-                      factor=10, plot_args={'color':'orange'})
+                      factor=10, mpl_kwargs={'color':'orange'})
    s.zoom(1.5)
    s.save()
 
@@ -369,7 +369,7 @@ Overplot Cell Edges
 Overplot Halo Annotations
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. function:: annotate_halos(self, halo_catalog, circle_args=None, \
+.. function:: annotate_halos(self, halo_catalog, mpl_kwargs=None, \
                              width=None, annotate_field=None, \
                              radius_field='virial_radius', \
                              center_field_prefix="particle_position", \
@@ -424,7 +424,7 @@ Overplot Halo Annotations
 Overplot a Straight Line
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. function:: annotate_line(self, p1, p2, coord_system='data', plot_args=None)
+.. function:: annotate_line(self, p1, p2, coord_system='data', mpl_kwargs=None)
 
    (This is a proxy for
    :class:`~yt.visualization.plot_modifications.LinePlotCallback`.)
@@ -448,7 +448,7 @@ Overplot Magnetic Field Quivers
 
 .. function:: annotate_magnetic_field(self, factor=16, scale=None, \
                                       scale_units=None, normalize=False, \
-                                      plot_args=None)
+                                      mpl_kwargs=None)
 
    (This is a proxy for
    :class:`~yt.visualization.plot_modifications.MagFieldCallback`.)
@@ -459,7 +459,7 @@ Overplot Magnetic Field Quivers
    magnetic fields will be scaled by their local (in-plane) length, allowing
    morphological features to be more clearly seen for fields with substantial
    variation in field strength. Additional arguments can be passed to the
-   ``plot_args`` dictionary, see matplotlib.axes.Axes.quiver for more info.
+   ``mpl_kwargs`` dictionary, see matplotlib.axes.Axes.quiver for more info.
 
 .. python-script::
 
@@ -468,7 +468,7 @@ Overplot Magnetic Field Quivers
                 parameters={"time_unit":(1, 'Myr'), "length_unit":(1, 'Mpc'),
                             "mass_unit":(1e17, 'Msun')})
    p = yt.ProjectionPlot(ds, 'z', 'density', center='c', width=(300, 'kpc'))
-   p.annotate_magnetic_field(plot_args={"headlength": 3})
+   p.annotate_magnetic_field(mpl_kwargs={"headlength": 3})
    p.save()
 
 .. _annotate-marker:
@@ -477,7 +477,7 @@ Annotate a Point With a Marker
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. function:: annotate_marker(self, pos, marker='x', coord_system='data', \
-                              plot_args=None)
+                              mpl_kwargs=None)
 
     (This is a proxy for
     :class:`~yt.visualization.plot_modifications.MarkerAnnotateCallback`.)
@@ -490,7 +490,7 @@ Annotate a Point With a Marker
    ds = yt.load("IsolatedGalaxy/galaxy0030/galaxy0030")
    s = yt.SlicePlot(ds, 'z', 'density', center='c', width=(10, 'kpc'))
    s.annotate_marker((-2,-2), coord_system='plot',
-                     plot_args={'color':'blue','s':500})
+                     mpl_kwargs={'color':'blue','s':500})
    s.save()
 
 .. _annotate-particles:
@@ -537,7 +537,7 @@ To plot only the central particles
 Overplot a Circle on a Plot
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. function:: annotate_sphere(self, center, radius, circle_args=None, \
+.. function:: annotate_sphere(self, center, radius, mpl_kwargs=None, \
                               coord_system='data', text=None, text_args=None)
 
     (This is a proxy for
@@ -551,7 +551,7 @@ Overplot a Circle on a Plot
    ds = yt.load("IsolatedGalaxy/galaxy0030/galaxy0030")
    p = yt.ProjectionPlot(ds, 'z', 'density', center='c', width=(20, 'kpc'))
    p.annotate_sphere([0.5, 0.5, 0.5], radius=(2, 'kpc'),
-                     circle_args={'color':'black'})
+                     mpl_kwargs={'color':'black'})
    p.save()
 
 .. _annotate-streamlines:
@@ -561,7 +561,7 @@ Overplot Streamlines
 
 .. function:: annotate_streamlines(self, field_x, field_y, factor=16, \
                                    density=1, display_threshold=None, \
-                                   plot_args=None)
+                                   mpl_kwargs=None)
 
    (This is a proxy for
    :class:`~yt.visualization.plot_modifications.StreamlineCallback`.)
@@ -659,7 +659,7 @@ Overplot Quivers for the Velocity Field
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. function:: annotate_velocity(self, factor=16, scale=None, scale_units=None, \
-                                normalize=False, plot_args=None)
+                                normalize=False, mpl_kwargs=None)
 
    (This is a proxy for
    :class:`~yt.visualization.plot_modifications.VelocityCallback`.)
@@ -670,14 +670,14 @@ Overplot Quivers for the Velocity Field
    velocity fields will be scaled by their local (in-plane) length, allowing
    morphological features to be more clearly seen for fields with substantial
    variation in field strength. Additional arguments can be passed to the
-   ``plot_args`` dictionary, see matplotlib.axes.Axes.quiver for more info.
+   ``mpl_kwargs`` dictionary, see matplotlib.axes.Axes.quiver for more info.
 
 .. python-script::
 
    import yt
    ds = yt.load("IsolatedGalaxy/galaxy0030/galaxy0030")
    p = yt.SlicePlot(ds, 'z', 'density', center='m', width=(10, 'kpc'))
-   p.annotate_velocity(plot_args={"headwidth": 4})
+   p.annotate_velocity(mpl_kwargs={"headwidth": 4})
    p.save()
 
 .. _annotate-timestamp:
@@ -755,7 +755,7 @@ Add a Physical Scale Bar
 Annotate Triangle Facets Callback
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. function:: annotate_triangle_facets(triangle_vertices, plot_args=None)
+.. function:: annotate_triangle_facets(triangle_vertices, mpl_kwargs=None)
 
    (This is a proxy for
    :class:`~yt.visualization.plot_modifications.TriangleFacetsCallback`.)
@@ -787,7 +787,7 @@ Annotate Triangle Facets Callback
    points = coords[conn-1]
 
    # Annotate slice-triangle intersection contours to the plot
-   s.annotate_triangle_facets(points, plot_args={"colors": 'black'})
+   s.annotate_triangle_facets(points, mpl_kwargs={"colors": 'black'})
    s.save()
 
 .. _annotate-mesh-lines:
@@ -795,7 +795,7 @@ Annotate Triangle Facets Callback
 Annotate Mesh Lines Callback
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. function:: annotate_mesh_lines(plot_args=None)
+.. function:: annotate_mesh_lines(mpl_kwargs=None)
 
    (This is a proxy for
    :class:`~yt.visualization.plot_modifications.MeshLinesCallback`.)
@@ -809,7 +809,7 @@ Annotate Mesh Lines Callback
    import yt
    ds = yt.load('MOOSE_sample_data/out.e')
    sl = yt.SlicePlot(ds, 2, ('connect1', 'nodal_aux'))
-   sl.annotate_mesh_lines(plot_args={'color':'black'})
+   sl.annotate_mesh_lines(mpl_kwargs={'color':'black'})
    sl.save()
 
 .. _annotate-ray:
@@ -817,7 +817,7 @@ Annotate Mesh Lines Callback
 Overplot the Path of a Ray
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. function:: annotate_ray(ray, plot_args=None)
+.. function:: annotate_ray(ray, mpl_kwargs=None)
 
    (This is a proxy for
    :class:`~yt.visualization.plot_modifications.RayCallback`.)

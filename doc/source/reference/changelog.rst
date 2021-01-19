@@ -497,7 +497,7 @@ Additional Improvements
   a tuple of strings instead of a string. If a tuple is supplied, the elments
   are joined with ``os.sep`` to form a path. See `PR 1630
   <https://github.com/yt-project/yt/pull/1630>`__.
-- The quiver callback now accepts a ``plot_args`` keyword argument that allows
+- The quiver callback now accepts a ``mpl_kwargs`` keyword argument that allows
   passing keyword arguments to matplotlib to allow for customization of the
   quiver plot. See `PR 1636 <https://github.com/yt-project/yt/pull/1636>`__.
 - Updates and improvements for the OpenPMD frontend. See `PR 1645

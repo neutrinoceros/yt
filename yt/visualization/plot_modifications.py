@@ -293,7 +293,7 @@ class VelocityCallback(PlotCallback):
     """
     Adds a 'quiver' plot of velocity to the plot, skipping all but
     every *factor* datapoint. *scale* is the data units per arrow
-    length unit using *scale_units* and *plot_args* allows you to
+    length unit using *scale_units* and *mpl_kwargs* allows you to
     pass in matplotlib arguments (see matplotlib.axes.Axes.quiver
     for more info). if *normalize* is True, the velocity fields
     will be scaled by their local (in-plane) length, allowing
@@ -305,16 +305,16 @@ class VelocityCallback(PlotCallback):
     _supported_geometries = ("cartesian", "spectral_cube", "polar", "cylindrical")
 
     def __init__(
-        self, factor=16, scale=None, scale_units=None, normalize=False, plot_args=None
+        self, factor=16, scale=None, scale_units=None, normalize=False, mpl_kwargs=None
     ):
         PlotCallback.__init__(self)
         self.factor = factor
         self.scale = scale
         self.scale_units = scale_units
         self.normalize = normalize
-        if plot_args is None:
-            plot_args = {}
-        self.plot_args = plot_args
+        if mpl_kwargs is None:
+            mpl_kwargs = {}
+        self.mpl_kwargs = mpl_kwargs
 
     def __call__(self, plot):
         # Instantiation of these is cheap
@@ -333,7 +333,7 @@ class VelocityCallback(PlotCallback):
                 scale=self.scale,
                 normalize=self.normalize,
                 scale_units=self.scale_units,
-                plot_args=self.plot_args,
+                mpl_kwargs=self.mpl_kwargs,
             )
         else:
             xax = plot.data.ds.coordinates.x_axis[plot.data.axis]
@@ -370,7 +370,7 @@ class VelocityCallback(PlotCallback):
                 normalize=self.normalize,
                 bv_x=bv_x,
                 bv_y=bv_y,
-                plot_args=self.plot_args,
+                mpl_kwargs=self.mpl_kwargs,
             )
         return qcb(plot)
 
@@ -379,7 +379,7 @@ class MagFieldCallback(PlotCallback):
     """
     Adds a 'quiver' plot of magnetic field to the plot, skipping all but
     every *factor* datapoint. *scale* is the data units per arrow
-    length unit using *scale_units* and *plot_args* allows you to pass
+    length unit using *scale_units* and *mpl_kwargs* allows you to pass
     in matplotlib arguments (see matplotlib.axes.Axes.quiver for more info).
     if *normalize* is True, the magnetic fields will be scaled by their
     local (in-plane) length, allowing morphological features to be more
@@ -390,16 +390,16 @@ class MagFieldCallback(PlotCallback):
     _supported_geometries = ("cartesian", "spectral_cube", "polar", "cylindrical")
 
     def __init__(
-        self, factor=16, scale=None, scale_units=None, normalize=False, plot_args=None
+        self, factor=16, scale=None, scale_units=None, normalize=False, mpl_kwargs=None
     ):
         PlotCallback.__init__(self)
         self.factor = factor
         self.scale = scale
         self.scale_units = scale_units
         self.normalize = normalize
-        if plot_args is None:
-            plot_args = {}
-        self.plot_args = plot_args
+        if mpl_kwargs is None:
+            mpl_kwargs = {}
+        self.mpl_kwargs = mpl_kwargs
 
     def __call__(self, plot):
         # Instantiation of these is cheap
@@ -417,7 +417,7 @@ class MagFieldCallback(PlotCallback):
                 scale=self.scale,
                 scale_units=self.scale_units,
                 normalize=self.normalize,
-                plot_args=self.plot_args,
+                mpl_kwargs=self.mpl_kwargs,
             )
         else:
             xax = plot.data.ds.coordinates.x_axis[plot.data.axis]
@@ -445,7 +445,7 @@ class MagFieldCallback(PlotCallback):
                 scale=self.scale,
                 scale_units=self.scale_units,
                 normalize=self.normalize,
-                plot_args=self.plot_args,
+                mpl_kwargs=self.mpl_kwargs,
             )
         return qcb(plot)
 
@@ -455,7 +455,7 @@ class QuiverCallback(PlotCallback):
     Adds a 'quiver' plot to any plot, using the *field_x* and *field_y*
     from the associated data, skipping every *factor* datapoints.
     *scale* is the data units per arrow length unit using *scale_units*
-    and *plot_args* allows you to pass in matplotlib arguments (see
+    and *mpl_kwargs* allows you to pass in matplotlib arguments (see
     matplotlib.axes.Axes.quiver for more info). if *normalize* is True,
     the fields will be scaled by their local (in-plane) length, allowing
     morphological features to be more clearly seen for fields with
@@ -475,7 +475,7 @@ class QuiverCallback(PlotCallback):
         normalize=False,
         bv_x=0,
         bv_y=0,
-        plot_args=None,
+        mpl_kwargs=None,
     ):
         PlotCallback.__init__(self)
         self.field_x = field_x
@@ -486,9 +486,9 @@ class QuiverCallback(PlotCallback):
         self.scale = scale
         self.scale_units = scale_units
         self.normalize = normalize
-        if plot_args is None:
-            plot_args = {}
-        self.plot_args = plot_args
+        if mpl_kwargs is None:
+            mpl_kwargs = {}
+        self.mpl_kwargs = mpl_kwargs
 
     def __call__(self, plot):
         x0, x1, y0, y1 = self._physical_bounds(plot)
@@ -556,7 +556,7 @@ class QuiverCallback(PlotCallback):
             pixY,
             scale=self.scale,
             scale_units=self.scale_units,
-            **self.plot_args,
+            **self.mpl_kwargs,
         )
         plot._axes.set_xlim(xx0, xx1)
         plot._axes.set_ylim(yy0, yy1)
@@ -581,7 +581,7 @@ class ContourCallback(PlotCallback):
         ncont=5,
         factor=4,
         clim=None,
-        plot_args=None,
+        mpl_kwargs=None,
         label=False,
         take_log=None,
         label_args=None,
@@ -589,16 +589,16 @@ class ContourCallback(PlotCallback):
         data_source=None,
     ):
         PlotCallback.__init__(self)
-        def_plot_args = {"colors": "k", "linestyles": "solid"}
+        def_mpl_kwargs = {"colors": "k", "linestyles": "solid"}
         def_text_args = {"colors": "w"}
         self.ncont = ncont
         self.field = field
         self.factor = factor
         self.clim = clim
         self.take_log = take_log
-        if plot_args is None:
-            plot_args = def_plot_args
-        self.plot_args = plot_args
+        if mpl_kwargs is None:
+            mpl_kwargs = def_mpl_kwargs
+        self.mpl_kwargs = mpl_kwargs
         self.label = label
         if label_args is not None:
             text_args = label_args
@@ -691,7 +691,7 @@ class ContourCallback(PlotCallback):
         if self.clim is not None:
             self.ncont = np.linspace(self.clim[0], self.clim[1], self.ncont)
 
-        cset = plot._axes.contour(xi, yi, zi, self.ncont, **self.plot_args)
+        cset = plot._axes.contour(xi, yi, zi, self.ncont, **self.mpl_kwargs)
         plot._axes.set_xlim(xx0, xx1)
         plot._axes.set_ylim(yy0, yy1)
 
@@ -903,19 +903,19 @@ class StreamlineCallback(PlotCallback):
         density=1,
         field_color=None,
         display_threshold=None,
-        plot_args=None,
+        mpl_kwargs=None,
     ):
         PlotCallback.__init__(self)
-        def_plot_args = {}
+        def_mpl_kwargs = {}
         self.field_x = field_x
         self.field_y = field_y
         self.field_color = field_color
         self.factor = factor
         self.dens = density
         self.display_threshold = display_threshold
-        if plot_args is None:
-            plot_args = def_plot_args
-        self.plot_args = plot_args
+        if mpl_kwargs is None:
+            mpl_kwargs = def_mpl_kwargs
+        self.mpl_kwargs = mpl_kwargs
 
     def __call__(self, plot):
         bounds = self._physical_bounds(plot)
@@ -941,14 +941,14 @@ class StreamlineCallback(PlotCallback):
                 mask = field_colors > self.display_threshold
                 lwdefault = matplotlib.rcParams["lines.linewidth"]
 
-                if "linewidth" in self.plot_args:
-                    linewidth = self.plot_args["linewidth"]
+                if "linewidth" in self.mpl_kwargs:
+                    linewidth = self.mpl_kwargs["linewidth"]
                 else:
                     linewidth = lwdefault
 
                 try:
                     linewidth *= mask
-                    self.plot_args["linewidth"] = linewidth
+                    self.mpl_kwargs["linewidth"] = linewidth
                 except ValueError as e:
                     err_msg = (
                         "Error applying display threshold: linewidth"
@@ -964,7 +964,7 @@ class StreamlineCallback(PlotCallback):
             np.linspace(xx0, xx1, nx, endpoint=True),
             np.linspace(yy0, yy1, ny, endpoint=True),
         )
-        streamplot_args = {
+        streammpl_kwargs = {
             "x": X,
             "y": Y,
             "u": pixX,
@@ -972,8 +972,8 @@ class StreamlineCallback(PlotCallback):
             "density": self.dens,
             "color": field_colors,
         }
-        streamplot_args.update(self.plot_args)
-        plot._axes.streamplot(**streamplot_args)
+        streammpl_kwargs.update(self.mpl_kwargs)
+        plot._axes.streamplot(**streammpl_kwargs)
         plot._axes.set_xlim(xx0, xx1)
         plot._axes.set_ylim(yy0, yy1)
 
@@ -1003,7 +1003,7 @@ class LinePlotCallback(PlotCallback):
             "figure" -- the MPL figure coordinates: (0,0) is lower left, (1,1)
                         is upper right
 
-    plot_args : dictionary, optional
+    mpl_kwargs : dictionary, optional
         This dictionary is passed to the MPL plot function for generating
         the line.  By default, it is: {'color':'white', 'linewidth':2}
 
@@ -1024,7 +1024,7 @@ class LinePlotCallback(PlotCallback):
     >>> ds = yt.load('IsolatedGalaxy/galaxy0030/galaxy0030')
     >>> s = yt.SlicePlot(ds, 'z', 'density')
     >>> s.annotate_line([0.1, 0.2, 0.3], [0.5, 0.6, 0.7], coord_system='data',
-                        plot_args={'color':'red', 'lineStyles':'--'})
+                        mpl_kwargs={'color':'red', 'lineStyles':'--'})
     >>> s.save()
 
     """
@@ -1032,14 +1032,14 @@ class LinePlotCallback(PlotCallback):
     _type_name = "line"
     _supported_geometries = ("cartesian", "spectral_cube", "polar", "cylindrical")
 
-    def __init__(self, p1, p2, data_coords=False, coord_system="data", plot_args=None):
+    def __init__(self, p1, p2, data_coords=False, coord_system="data", mpl_kwargs=None):
         PlotCallback.__init__(self)
-        def_plot_args = {"color": "white", "linewidth": 2}
+        def_mpl_kwargs = {"color": "white", "linewidth": 2}
         self.p1 = p1
         self.p2 = p2
-        if plot_args is None:
-            plot_args = def_plot_args
-        self.plot_args = plot_args
+        if mpl_kwargs is None:
+            mpl_kwargs = def_mpl_kwargs
+        self.mpl_kwargs = mpl_kwargs
         if data_coords:
             coord_system = "data"
             warnings.warn(
@@ -1054,7 +1054,7 @@ class LinePlotCallback(PlotCallback):
         p2 = self._sanitize_coord_system(plot, self.p2, coord_system=self.coord_system)
         xx0, xx1, yy0, yy1 = self._plot_bounds(plot)
         plot._axes.plot(
-            [p1[0], p2[0]], [p1[1], p2[1]], transform=self.transform, **self.plot_args
+            [p1[0], p2[0]], [p1[1], p2[1]], transform=self.transform, **self.mpl_kwargs
         )
         plot._axes.set_xlim(xx0, xx1)
         plot._axes.set_ylim(yy0, yy1)
@@ -1072,8 +1072,10 @@ class ImageLineCallback(LinePlotCallback):
     _type_name = "image_line"
     _supported_geometries = ("cartesian", "spectral_cube", "cylindrical")
 
-    def __init__(self, p1, p2, data_coords=False, coord_system="axis", plot_args=None):
-        super().__init__(p1, p2, data_coords, coord_system, plot_args)
+    def __init__(self, p1, p2, data_coords=False, coord_system="axis", mpl_kwargs=None):
+        super().__init__(
+            p1, p2, data_coords, coord_system, mpl_kwargs
+        )
         warnings.warn(
             "The ImageLineCallback (annotate_image_line()) is "
             "deprecated.  Please use the LinePlotCallback "
@@ -1089,7 +1091,7 @@ class CuttingQuiverCallback(PlotCallback):
     Get a quiver plot on top of a cutting plane, using *field_x* and
     *field_y*, skipping every *factor* datapoint in the discretization.
     *scale* is the data units per arrow length unit using *scale_units*
-    and *plot_args* allows you to pass in matplotlib arguments (see
+    and *mpl_kwargs* allows you to pass in matplotlib arguments (see
     matplotlib.axes.Axes.quiver for more info). if *normalize* is True,
     the fields will be scaled by their local (in-plane) length, allowing
     morphological features to be more clearly seen for fields with
@@ -1107,7 +1109,7 @@ class CuttingQuiverCallback(PlotCallback):
         scale=None,
         scale_units=None,
         normalize=False,
-        plot_args=None,
+        mpl_kwargs=None,
     ):
         PlotCallback.__init__(self)
         self.field_x = field_x
@@ -1116,9 +1118,9 @@ class CuttingQuiverCallback(PlotCallback):
         self.scale = scale
         self.scale_units = scale_units
         self.normalize = normalize
-        if plot_args is None:
-            plot_args = {}
-        self.plot_args = plot_args
+        if mpl_kwargs is None:
+            mpl_kwargs = {}
+        self.mpl_kwargs = mpl_kwargs
 
     def __call__(self, plot):
         x0, x1, y0, y1 = self._physical_bounds(plot)
@@ -1178,7 +1180,7 @@ class CuttingQuiverCallback(PlotCallback):
             pixY,
             scale=self.scale,
             scale_units=self.scale_units,
-            **self.plot_args,
+            **self.mpl_kwargs,
         )
         plot._axes.set_xlim(xx0, xx1)
         plot._axes.set_ylim(yy0, yy1)
@@ -1192,13 +1194,13 @@ class ClumpContourCallback(PlotCallback):
     _type_name = "clumps"
     _supported_geometries = ("cartesian", "spectral_cube", "cylindrical")
 
-    def __init__(self, clumps, plot_args=None):
+    def __init__(self, clumps, mpl_kwargs=None):
         self.clumps = clumps
-        if plot_args is None:
-            plot_args = {}
-        if "color" in plot_args:
-            plot_args["colors"] = plot_args.pop("color")
-        self.plot_args = plot_args
+        if mpl_kwargs is None:
+            mpl_kwargs = {}
+        if "color" in mpl_kwargs:
+            mpl_kwargs["colors"] = mpl_kwargs.pop("color")
+        self.mpl_kwargs = mpl_kwargs
 
     def __call__(self, plot):
         bounds = self._physical_bounds(plot)
@@ -1243,7 +1245,7 @@ class ClumpContourCallback(PlotCallback):
             )
             buff = np.maximum(temp, buff)
         self.rv = plot._axes.contour(
-            buff, np.unique(buff), extent=extent, **self.plot_args
+            buff, np.unique(buff), extent=extent, **self.mpl_kwargs
         )
 
 
@@ -1304,7 +1306,7 @@ class ArrowCallback(PlotCallback):
             "figure" -- the MPL figure coordinates: (0,0) is lower left, (1,1)
                         is upper right
 
-    plot_args : dictionary, optional
+    mpl_kwargs : dictionary, optional
         This dictionary is passed to the MPL arrow function for generating
         the arrow.  By default, it is: {'color':'white'}
 
@@ -1324,7 +1326,7 @@ class ArrowCallback(PlotCallback):
     >>> ds = yt.load('IsolatedGalaxy/galaxy0030/galaxy0030')
     >>> s = yt.SlicePlot(ds, 'z', 'density')
     >>> s.annotate_arrow([0.1, -0.1], length=0.06, coord_system='plot',
-    ...                  plot_args={'color':'red'})
+    ...                  mpl_kwargs={'color':'red'})
     >>> s.save()
 
     """
@@ -1342,9 +1344,9 @@ class ArrowCallback(PlotCallback):
         head_length=0.01,
         starting_pos=None,
         coord_system="data",
-        plot_args=None,
+        mpl_kwargs=None,
     ):
-        def_plot_args = {"color": "white"}
+        def_mpl_kwargs = {"color": "white"}
         self.pos = pos
         self.code_size = code_size
         self.length = length
@@ -1354,9 +1356,9 @@ class ArrowCallback(PlotCallback):
         self.starting_pos = starting_pos
         self.coord_system = coord_system
         self.transform = None
-        if plot_args is None:
-            plot_args = def_plot_args
-        self.plot_args = plot_args
+        if mpl_kwargs is None:
+            mpl_kwargs = def_mpl_kwargs
+        self.mpl_kwargs = mpl_kwargs
 
     def __call__(self, plot):
         x, y = self._sanitize_coord_system(
@@ -1406,7 +1408,7 @@ class ArrowCallback(PlotCallback):
                 head_length=self.head_length,
                 transform=self.transform,
                 length_includes_head=True,
-                **self.plot_args,
+                **self.mpl_kwargs,
             )
         except ValueError:
             for i in range(len(x)):
@@ -1420,7 +1422,7 @@ class ArrowCallback(PlotCallback):
                     head_length=self.head_length,
                     transform=self.transform,
                     length_includes_head=True,
-                    **self.plot_args,
+                    **self.mpl_kwargs,
                 )
         plot._axes.set_xlim(xx0, xx1)
         plot._axes.set_ylim(yy0, yy1)
@@ -1455,7 +1457,7 @@ class MarkerAnnotateCallback(PlotCallback):
             "figure" -- the MPL figure coordinates: (0,0) is lower left, (1,1)
                         is upper right
 
-    plot_args : dictionary, optional
+    mpl_kwargs : dictionary, optional
         This dictionary is passed to the MPL scatter function for generating
         the marker.  By default, it is: {'color':'white', 's':50}
 
@@ -1474,7 +1476,7 @@ class MarkerAnnotateCallback(PlotCallback):
     >>> ds = yt.load('IsolatedGalaxy/galaxy0030/galaxy0030')
     >>> s = yt.SlicePlot(ds, 'z', 'density')
     >>> s.annotate_marker([0.1, 0.2], marker='o', coord_system='axis',
-    ...                   plot_args={'color':'yellow', 's':200})
+    ...                   mpl_kwargs={'color':'yellow', 's':200})
     >>> s.save()
 
     """
@@ -1482,13 +1484,13 @@ class MarkerAnnotateCallback(PlotCallback):
     _type_name = "marker"
     _supported_geometries = ("cartesian", "spectral_cube", "polar", "cylindrical")
 
-    def __init__(self, pos, marker="x", coord_system="data", plot_args=None):
-        def_plot_args = {"color": "w", "s": 50}
+    def __init__(self, pos, marker="x", coord_system="data", mpl_kwargs=None):
+        def_mpl_kwargs = {"color": "w", "s": 50}
         self.pos = pos
         self.marker = marker
-        if plot_args is None:
-            plot_args = def_plot_args
-        self.plot_args = plot_args
+        if mpl_kwargs is None:
+            mpl_kwargs = def_mpl_kwargs
+        self.mpl_kwargs = mpl_kwargs
         self.coord_system = coord_system
         self.transform = None
 
@@ -1498,7 +1500,7 @@ class MarkerAnnotateCallback(PlotCallback):
         )
         xx0, xx1, yy0, yy1 = self._plot_bounds(plot)
         plot._axes.scatter(
-            x, y, marker=self.marker, transform=self.transform, **self.plot_args
+            x, y, marker=self.marker, transform=self.transform, **self.mpl_kwargs
         )
         plot._axes.set_xlim(xx0, xx1)
         plot._axes.set_ylim(yy0, yy1)
@@ -1516,7 +1518,7 @@ class SphereCallback(PlotCallback):
     radius : YTArray, float, or (1, ('kpc')) style tuple
         The radius of the circle in code coordinates
 
-    circle_args : dict, optional
+    mpl_kwargs : dict, optional
         This dictionary is passed to the MPL circle object. By default,
         {'color':'white'}
 
@@ -1560,20 +1562,20 @@ class SphereCallback(PlotCallback):
         self,
         center,
         radius,
-        circle_args=None,
+        mpl_kwargs=None,
         text=None,
         coord_system="data",
         text_args=None,
     ):
         def_text_args = {"color": "white"}
-        def_circle_args = {"color": "white"}
+        def_mpl_kwargs = {"color": "white"}
         self.center = center
         self.radius = radius
-        if circle_args is None:
-            circle_args = def_circle_args
-        if "fill" not in circle_args:
-            circle_args["fill"] = False
-        self.circle_args = circle_args
+        if mpl_kwargs is None:
+            mpl_kwargs = def_mpl_kwargs
+        if "fill" not in mpl_kwargs:
+            mpl_kwargs["fill"] = False
+        self.mpl_kwargs = mpl_kwargs
         self.text = text
         if text_args is None:
             text_args = def_text_args
@@ -1607,7 +1609,7 @@ class SphereCallback(PlotCallback):
             plot, self.center, coord_system=self.coord_system
         )
 
-        cir = Circle((x, y), self.radius, transform=self.transform, **self.circle_args)
+        cir = Circle((x, y), self.radius, transform=self.transform, **self.mpl_kwargs)
         xx0, xx1, yy0, yy1 = self._plot_bounds(plot)
 
         plot._axes.add_patch(cir)
@@ -1777,7 +1779,7 @@ class HaloCatalogCallback(PlotCallback):
         The object containing halos to be overplotted. This can
         be a HaloCatalog object, a loaded halo catalog dataset,
         or a data container from a halo catalog dataset.
-    circle_args : list
+    mpl_kwargs : list
         Contains the arguments controlling the
         appearance of the circles, supplied to the
         Matplotlib patch Circle.
@@ -1898,9 +1900,9 @@ class HaloCatalogCallback(PlotCallback):
             mpl_kwargs = {"edgecolor": "white", "facecolor": "None"}
 
         depr_message = "keyword `{}` is deprecated, use `{}` instead."
-        if circle_args is not None:
-            issue_deprecation_warning(depr_message.format("circle_args", "mpl_kwargs"))
-            mpl_kwargs.update(circle_args)
+        if mpl_kwargs is not None:
+            issue_deprecation_warning(depr_message.format("mpl_kwargs", "mpl_kwargs"))
+            mpl_kwargs.update(mpl_kwargs)
         if circle_kwargs is not None:
             issue_deprecation_warning(
                 depr_message.format("circle_kwargs", "mpl_kwargs")
@@ -1917,7 +1919,7 @@ class HaloCatalogCallback(PlotCallback):
             text_kwargs.update(text_args)
 
         # TODO: rename thos attributes (minimal: args -> kwargs)
-        self.circle_args = mpl_kwargs
+        self.mpl_kwargs = mpl_kwargs
         self.text_args = text_kwargs
 
     def __call__(self, plot):
@@ -1983,7 +1985,7 @@ class HaloCatalogCallback(PlotCallback):
             radius = radius[indices]
 
         for x, y, r in zip(px, py, radius):
-            plot._axes.add_artist(Circle(xy=(x, y), radius=r, **self.circle_args))
+            plot._axes.add_artist(Circle(xy=(x, y), radius=r, **self.mpl_kwargs))
 
         plot._axes.set_xlim(xx0, xx1)
         plot._axes.set_ylim(yy0, yy1)
@@ -2183,7 +2185,7 @@ class MeshLinesCallback(PlotCallback):
     Parameters
     ----------
 
-    plot_args:   dict, optional
+    mpl_kwargs:   dict, optional
         A dictionary of arguments that will be passed to matplotlib.
 
     Example
@@ -2192,16 +2194,16 @@ class MeshLinesCallback(PlotCallback):
     >>> import yt
     >>> ds = yt.load("MOOSE_sample_data/out.e-s010")
     >>> sl = yt.SlicePlot(ds, 'z', ('connect2', 'convected'))
-    >>> sl.annotate_mesh_lines(plot_args={'color':'black'})
+    >>> sl.annotate_mesh_lines(mpl_kwargs={'color':'black'})
 
     """
 
     _type_name = "mesh_lines"
     _supported_geometries = ("cartesian", "spectral_cube")
 
-    def __init__(self, plot_args=None):
+    def __init__(self, mpl_kwargs=None):
         super().__init__()
-        self.plot_args = plot_args
+        self.mpl_kwargs = mpl_kwargs
 
     def promote_2d_to_3d(self, coords, indices, plot):
         new_coords = np.zeros((2 * coords.shape[0], 3))
@@ -2248,7 +2250,7 @@ class MeshLinesCallback(PlotCallback):
             tri_indices = triangulate_indices(indices.astype(np.int_))
             points = coords[tri_indices]
 
-            tfc = TriangleFacetsCallback(points, plot_args=self.plot_args)
+            tfc = TriangleFacetsCallback(points, mpl_kwargs=self.mpl_kwargs)
             tfc(plot)
 
 
@@ -2266,9 +2268,9 @@ class TriangleFacetsCallback(PlotCallback):
     _type_name = "triangle_facets"
     _supported_geometries = ("cartesian", "spectral_cube")
 
-    def __init__(self, triangle_vertices, plot_args=None):
+    def __init__(self, triangle_vertices, mpl_kwargs=None):
         super().__init__()
-        self.plot_args = {} if plot_args is None else plot_args
+        self.mpl_kwargs = {} if mpl_kwargs is None else mpl_kwargs
         self.vertices = triangle_vertices
 
     def __call__(self, plot):
@@ -2293,7 +2295,7 @@ class TriangleFacetsCallback(PlotCallback):
         # convert back to shape (nlines, 2, 2)
         l_cy = np.rollaxis(l_cy, 2, 0)
         # create line collection and add it to the plot
-        lc = matplotlib.collections.LineCollection(l_cy, **self.plot_args)
+        lc = matplotlib.collections.LineCollection(l_cy, **self.mpl_kwargs)
         plot._axes.add_collection(lc)
 
 
@@ -2778,7 +2780,7 @@ class RayCallback(PlotCallback):
     annotate_ray() will properly account for periodic rays across the volume.
     If arrow is set to True, uses the MPL.pyplot.arrow function, otherwise
     uses the MPL.pyplot.plot function to plot a normal line.  Adjust
-    plot_args accordingly.
+    mpl_kwargs accordingly.
 
     Parameters
     ----------
@@ -2794,7 +2796,7 @@ class RayCallback(PlotCallback):
         direction
         Default: False
 
-    plot_args : dictionary, optional
+    mpl_kwargs : dictionary, optional
         A dictionary of any arbitrary parameters to be passed to the Matplotlib
         line object.  Defaults: {'color':'white', 'linewidth':2}.
 
@@ -2827,14 +2829,14 @@ class RayCallback(PlotCallback):
     _type_name = "ray"
     _supported_geometries = ("cartesian", "spectral_cube", "force")
 
-    def __init__(self, ray, arrow=False, plot_args=None):
+    def __init__(self, ray, arrow=False, mpl_kwargs=None):
         PlotCallback.__init__(self)
-        def_plot_args = {"color": "white", "linewidth": 2}
+        def_mpl_kwargs = {"color": "white", "linewidth": 2}
         self.ray = ray
         self.arrow = arrow
-        if plot_args is None:
-            plot_args = def_plot_args
-        self.plot_args = plot_args
+        if mpl_kwargs is None:
+            mpl_kwargs = def_mpl_kwargs
+        self.mpl_kwargs = mpl_kwargs
 
     def _process_ray(self):
         """
@@ -2908,7 +2910,7 @@ class RayCallback(PlotCallback):
         # and all other ray segments are lines
         for segment in segments[:-1]:
             cb = LinePlotCallback(
-                segment[0], segment[1], coord_system="data", plot_args=self.plot_args
+                segment[0], segment[1], coord_system="data", mpl_kwargs=self.mpl_kwargs
             )
             cb(plot)
         segment = segments[-1]
@@ -2917,11 +2919,11 @@ class RayCallback(PlotCallback):
                 segment[1],
                 starting_pos=segment[0],
                 coord_system="data",
-                plot_args=self.plot_args,
+                mpl_kwargs=self.mpl_kwargs,
             )
         else:
             cb = LinePlotCallback(
-                segment[0], segment[1], coord_system="data", plot_args=self.plot_args
+                segment[0], segment[1], coord_system="data", mpl_kwargs=self.mpl_kwargs
             )
         cb(plot)
         return plot
