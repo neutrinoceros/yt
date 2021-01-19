@@ -722,7 +722,7 @@ Add a Physical Scale Bar
                              scale_text_format="{scale} {units}", \
                              max_frac=0.16, min_frac=0.015, \
                              coord_system='axis', text_kwargs=None, \
-                             size_bar_args=None, draw_inset_box=False, \
+                             size_bar_kwargs=None, draw_inset_box=False, \
                              inset_box_kwargs=None)
 
    (This is a proxy for
@@ -735,9 +735,9 @@ Add a Physical Scale Bar
     specified, an appropriate pair will be determined such that your scale bar
     is never smaller than min_frac or greater than max_frac of your plottable
     axis length.  Additional customization of the scale bar is possible by
-    adjusting the text_kwargs and size_bar_args dictionaries.  The text_kwargs
+    adjusting the text_kwargs and size_bar_kwargs dictionaries.  The text_kwargs
     dictionary accepts matplotlib's font_properties arguments to override
-    the default font_properties for the current plot.  The size_bar_args
+    the default font_properties for the current plot.  The size_bar_kwargs
     dictionary accepts keyword arguments for the AnchoredSizeBar class in
     matplotlib's axes_grid toolkit. Finally, the format of the scale bar text
     can be adjusted using the scale_text_format keyword argument.

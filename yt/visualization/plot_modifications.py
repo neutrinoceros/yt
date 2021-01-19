@@ -2546,9 +2546,9 @@ class ScaleCallback(PlotCallback):
     specified, an appropriate pair will be determined such that your scale bar
     is never smaller than min_frac or greater than max_frac of your plottable
     axis length.  Additional customization of the scale bar is possible by
-    adjusting the text_kwargs and size_bar_args dictionaries.  The text_kwargs
+    adjusting the text_kwargs and size_bar_kwargs dictionaries.  The text_kwargs
     dictionary accepts matplotlib's font_properties arguments to override
-    the default font_properties for the current plot.  The size_bar_args
+    the default font_properties for the current plot.  The size_bar_kwargs
     dictionary accepts keyword arguments for the AnchoredSizeBar class in
     matplotlib's axes_grid toolkit.
 
@@ -2598,7 +2598,7 @@ class ScaleCallback(PlotCallback):
         use the defaults of the plot.  Thus one can modify the text size with:
         ``text_kwargs={'size':24}``
 
-    size_bar_args : dictionary, optional
+    size_bar_kwargs : dictionary, optional
         A dictionary of parameters to be passed to the Matplotlib
         AnchoredSizeBar initializer.
         Defaults: ``{'pad': 0.25, 'sep': 5, 'borderpad': 1, 'color': 'w'}``
@@ -2641,13 +2641,13 @@ class ScaleCallback(PlotCallback):
         min_frac=0.015,
         coord_system="axis",
         text_kwargs=None,
-        size_bar_args=None,
+        size_bar_kwargs=None,
         draw_inset_box=False,
         inset_box_kwargs=None,
         scale_text_format="{scale} {units}",
     ):
 
-        def_size_bar_args = {"pad": 0.05, "sep": 5, "borderpad": 1, "color": "w"}
+        def_size_bar_kwargs = {"pad": 0.05, "sep": 5, "borderpad": 1, "color": "w"}
 
         def_inset_box_kwargs = {
             "facecolor": "black",
@@ -2666,10 +2666,10 @@ class ScaleCallback(PlotCallback):
         self.min_frac = min_frac
         self.coord_system = coord_system
         self.scale_text_format = scale_text_format
-        if size_bar_args is None:
-            self.size_bar_args = def_size_bar_args
+        if size_bar_kwargs is None:
+            self.size_bar_kwargs = def_size_bar_kwargs
         else:
-            self.size_bar_args = size_bar_args
+            self.size_bar_kwargs = size_bar_kwargs
         if inset_box_kwargs is None:
             self.inset_box_kwargs = def_inset_box_kwargs
         else:
@@ -2733,11 +2733,11 @@ class ScaleCallback(PlotCallback):
         image_scale = (
             plot.frb.convert_distance_x(self.scale) / plot.frb.convert_distance_x(xsize)
         ).v
-        size_vertical = self.size_bar_args.pop("size_vertical", 0.005 * plot.aspect)
-        fontproperties = self.size_bar_args.pop(
+        size_vertical = self.size_bar_kwargs.pop("size_vertical", 0.005 * plot.aspect)
+        fontproperties = self.size_bar_kwargs.pop(
             "fontproperties", plot.font_properties.copy()
         )
-        frameon = self.size_bar_args.pop("frameon", self.draw_inset_box)
+        frameon = self.size_bar_kwargs.pop("frameon", self.draw_inset_box)
         # FontProperties instances use set_<property>() setter functions
         for key, val in self.text_kwargs.items():
             setter_func = "set_" + key
@@ -2752,8 +2752,8 @@ class ScaleCallback(PlotCallback):
 
         # this "anchors" the size bar to a box centered on self.pos in axis
         # coordinates
-        self.size_bar_args["bbox_to_anchor"] = self.pos
-        self.size_bar_args["bbox_transform"] = plot._axes.transAxes
+        self.size_bar_kwargs["bbox_to_anchor"] = self.pos
+        self.size_bar_kwargs["bbox_transform"] = plot._axes.transAxes
 
         bar = AnchoredSizeBar(
             plot._axes.transAxes,
@@ -2763,7 +2763,7 @@ class ScaleCallback(PlotCallback):
             size_vertical=size_vertical,
             fontproperties=fontproperties,
             frameon=frameon,
-            **self.size_bar_args,
+            **self.size_bar_kwargs,
         )
 
         bar.patch.set(**self.inset_box_kwargs)
