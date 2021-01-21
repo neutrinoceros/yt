@@ -1110,9 +1110,7 @@ class ImageLineCallback(LinePlotCallback):
     _supported_geometries = ("cartesian", "spectral_cube", "cylindrical")
 
     def __init__(self, p1, p2, data_coords=False, coord_system="axis", plot_args=None):
-        super().__init__(
-            p1, p2, data_coords, coord_system, mpl_kwargs=plot_args
-        )
+        super().__init__(p1, p2, data_coords, coord_system, mpl_kwargs=plot_args)
         issue_deprecation_warning(
             "The ImageLineCallback (annotate_image_line()) is "
             "deprecated.  Please use the LinePlotCallback "
