@@ -504,6 +504,7 @@ class BaseQuiverCallback(PlotCallback, ABC):
         scale_units=None,
         normalize=False,
         plot_args=None,
+        cbar_loc=None,
         **kwargs,
     ):
         PlotCallback.__init__(self)
@@ -514,6 +515,7 @@ class BaseQuiverCallback(PlotCallback, ABC):
         self.scale = scale
         self.scale_units = scale_units
         self.normalize = normalize
+        self.cbar_loc = cbar_loc
         if plot_args is None:
             plot_args = kwargs
         else:
@@ -543,7 +545,32 @@ class BaseQuiverCallback(PlotCallback, ABC):
             scale_units=self.scale_units,
         )
         kwargs.update(self.plot_args)
-        return plot._axes.quiver(*args, **kwargs)
+        img = plot._axes.quiver(*args, **kwargs)
+        left = 0.2  # make it parameterized
+        bottom = 0.2  # make it parameterized
+        width = 0.2
+        heigth = 0.02
+        cax = plot._figure.add_axes((left, bottom, width, heigth))
+        cbar = plot._figure.colorbar(
+            img, cax=cax, label="hello", orientation="horizontal"
+        )
+
+        """
+        cbar = plot._figure.colorbar(
+            img,
+        ax=plot._axes,
+        shrink=0.2,
+        orientation="horizontal",
+        aspect=10,
+        anchor=(0.03, 7.5),
+        label="coucou"
+        )
+        """
+
+        # cbar.set_ticks([-tick_max, 0, tick_max], which="major")
+        cbar.ax.xaxis.set_ticks_position("bottom")
+        cbar.ax.xaxis.set_label_position("top")
+        # cbar.ax.set_xticks([], minor=True)
 
 
 class QuiverCallback(BaseQuiverCallback):
