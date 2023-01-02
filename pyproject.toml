@@ -235,7 +235,7 @@ include-package-data = true
 zip-safe = false
 
 [tool.setuptools.packages.find]
-namespaces = false
+#namespaces = false
 
 # explicitly disable auto-includes to avoid setuptools deprecation warnings, see
 # https://github.com/yt-project/yt/issues/4279
