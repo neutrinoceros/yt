@@ -39,11 +39,11 @@ repos:
         types_or: [python, pyi, jupyter]
         additional_dependencies: [black==22.10.0]
 
--   repo: https://github.com/asottile/blacken-docs
-    rev: 1.13.0
-    hooks:
-    -   id: blacken-docs
-        additional_dependencies: [black==22.6.0]
+#-   repo: https://github.com/asottile/blacken-docs
+#    rev: 1.13.0
+#    hooks:
+#    -   id: blacken-docs
+#        additional_dependencies: [black==22.6.0]
 
 - repo: https://github.com/charliermarsh/ruff-pre-commit
   rev: v0.0.241
@@ -63,8 +63,8 @@ repos:
     -   id: rst-backticks
 
 
-#- repo: https://github.com/MarcoGorelli/cython-lint
-#  rev: v0.11.0
-#  hooks:
-#  - id: cython-lint
-#    args: [--no-pycodestyle]
+- repo: https://github.com/MarcoGorelli/cython-lint
+  rev: v0.11.0
+  hooks:
+  - id: cython-lint
+    args: [--no-pycodestyle]
