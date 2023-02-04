@@ -26,24 +26,24 @@ repos:
     - id: check-executables-have-shebangs
     - id: check-yaml
 
--   repo: local
-    hooks:
-    # NOTE: we make `black` a local hook because if it's installed from
-    # PyPI (rather than from source) then it'll run twice as fast thanks to mypyc
-    -   id: black
-        name: black-jupyter
-        description: "Black: The uncompromising Python code formatter"
-        entry: black
-        language: python
-        require_serial: true
-        types_or: [python, pyi, jupyter]
-        additional_dependencies: [black==22.10.0]
+# -   repo: local
+#     hooks:
+#     # NOTE: we make `black` a local hook because if it's installed from
+#     # PyPI (rather than from source) then it'll run twice as fast thanks to mypyc
+#     -   id: black
+#         name: black-jupyter
+#         description: "Black: The uncompromising Python code formatter"
+#         entry: black
+#         language: python
+#         require_serial: true
+#         types_or: [python, pyi, jupyter]
+#         additional_dependencies: [black==22.10.0]
 
-#-   repo: https://github.com/asottile/blacken-docs
-#    rev: 1.13.0
-#    hooks:
-#    -   id: blacken-docs
-#        additional_dependencies: [black==22.6.0]
+-   repo: https://github.com/asottile/blacken-docs
+    rev: 1.13.0
+    hooks:
+    -   id: blacken-docs
+        additional_dependencies: [black==22.6.0]
 
 - repo: https://github.com/charliermarsh/ruff-pre-commit
   rev: v0.0.241
