@@ -2,11 +2,11 @@ import numpy as np
 import pytest
 from numpy.testing import assert_array_equal
 
-from yt.testing import fake_particle_ds, requires_module
+from yt.testing import fake_particle_ds, requires_module_pytest as requires_module
 from yt.utilities.exceptions import YTFieldNotFound
 
 
-@requires_module("firefly")
+@requires_module("firefly", "h5py")
 def test_firefly_JSON_string():
     ds = fake_particle_ds()
     ad = ds.all_data()
@@ -25,7 +25,7 @@ def test_firefly_JSON_string():
     assert len(reader.JSON) > 0
 
 
-@requires_module("firefly")
+@requires_module("firefly", "h5py")
 def test_firefly_write_to_disk(tmp_path):
     tmpdir = str(tmp_path)  # create_firefly_object needs a str, not PosixPath
 
@@ -67,7 +67,7 @@ def firefly_test_dataset():
     return ds
 
 
-@requires_module("firefly")
+@requires_module("firefly", "h5py")
 @pytest.mark.parametrize(
     "fields_to_include,fields_units",
     [
@@ -94,7 +94,7 @@ def test_field_empty_specification(
     )
 
 
-@requires_module("firefly")
+@requires_module("firefly", "h5py")
 def test_field_unique_string_specification(firefly_test_dataset):
     # Test unique field (pt2only_field)
     dd = firefly_test_dataset.all_data()
@@ -124,7 +124,7 @@ def test_field_unique_string_specification(firefly_test_dataset):
     assert_array_equal(dd[("pt2", "pt2only_field")].d, pt2.field_arrays[arrind])
 
 
-@requires_module("firefly")
+@requires_module("firefly", "h5py")
 def test_field_common_string_specification(firefly_test_dataset):
     # Test common field (common_field)
     dd = firefly_test_dataset.all_data()
@@ -155,7 +155,7 @@ def test_field_common_string_specification(firefly_test_dataset):
     assert_array_equal(dd[("pt2", "common_field")].d, pt2.field_arrays[arrind])
 
 
-@requires_module("firefly")
+@requires_module("firefly", "h5py")
 @pytest.mark.parametrize(
     "fields_to_include,fields_units",
     [
@@ -211,7 +211,7 @@ def test_field_tuple_specification(
                 assert fname not in pg.field_names
 
 
-@requires_module("firefly")
+@requires_module("firefly", "h5py")
 @pytest.mark.parametrize(
     "fields_to_include,fields_units,ErrorType",
     [
@@ -247,7 +247,7 @@ def test_field_invalid_specification(
         )
 
 
-@requires_module("firefly")
+@requires_module("firefly", "h5py")
 def test_field_mixed_specification(firefly_test_dataset):
     dd = firefly_test_dataset.all_data()
 
