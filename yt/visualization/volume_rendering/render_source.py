@@ -337,9 +337,8 @@ class VolumeSource(RenderSource, abc.ABC):
             raise (
                 RuntimeError(
                     "VolumeSource.field can only be a single field but received "
-                    "multiple fields: %s"
+                    f"multiple fields: {field}"
                 )
-                % field
             )
         field = field[0]
         if self._field != field:
