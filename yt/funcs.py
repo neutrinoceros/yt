@@ -1090,8 +1090,9 @@ def array_like_field(data, x, field):
 def validate_3d_array(obj):
     if not is_sequence(obj) or len(obj) != 3:
         raise TypeError(
-            "Expected an array of size (3,), received '{}' of "
-            "length {}".format(str(type(obj)).split("'")[1], len(obj))
+            "Expected an array of size (3,), received '{}' of " "length {}".format(
+                str(type(obj)).split("'")[1], len(obj)
+            )
         )
 
 

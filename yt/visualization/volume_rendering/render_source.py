@@ -334,10 +334,13 @@ class VolumeSource(RenderSource, abc.ABC):
     def field(self, value):
         field = self.data_source._determine_fields(value)
         if len(field) > 1:
-            raise RuntimeError(
-                "VolumeSource.field can only be a single field but received "
-                "multiple fields: %s"
-            ) % field
+            raise (
+                RuntimeError(
+                    "VolumeSource.field can only be a single field but received "
+                    "multiple fields: %s"
+                )
+                % field
+            )
         field = field[0]
         if self._field != field:
             log_field = self.data_source.ds.field_info[field].take_log

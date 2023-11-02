@@ -552,7 +552,8 @@ class RAMSESIndex(OctreeIndex):
 
         self.domains = [RAMSESDomainFile(self.dataset, i + 1) for i in cpu_list]
         total_octs = sum(
-            dom.local_oct_count for dom in self.domains  # + dom.ngridbound.sum()
+            dom.local_oct_count
+            for dom in self.domains  # + dom.ngridbound.sum()
         )
         force_max_level, convention = self.ds._force_max_level
         if convention == "yt":

@@ -271,9 +271,7 @@ class TestParticlePhasePlotSave(unittest.TestCase):
             "matplotlib.backends.backend_agg.FigureCanvasAgg.print_figure"
         ), mock.patch(
             "matplotlib.backends.backend_pdf.FigureCanvasPdf.print_figure"
-        ), mock.patch(
-            "matplotlib.backends.backend_ps.FigureCanvasPS.print_figure"
-        ):
+        ), mock.patch("matplotlib.backends.backend_ps.FigureCanvasPS.print_figure"):
             for p in particle_phases:
                 for fname in TEST_FLNMS:
                     p.save(fname)
@@ -388,9 +386,7 @@ class TestParticleProjectionPlotSave(unittest.TestCase):
             "matplotlib.backends.backend_agg.FigureCanvasAgg.print_figure"
         ), mock.patch(
             "matplotlib.backends.backend_pdf.FigureCanvasPdf.print_figure"
-        ), mock.patch(
-            "matplotlib.backends.backend_ps.FigureCanvasPS.print_figure"
-        ):
+        ), mock.patch("matplotlib.backends.backend_ps.FigureCanvasPS.print_figure"):
             for p in particle_projs:
                 for fname in TEST_FLNMS:
                     p.save(fname)[0]
