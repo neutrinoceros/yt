@@ -60,7 +60,7 @@ cdef class GridTree:
                   np.ndarray[np.int64_t, ndim=1] num_children):
 
         cdef int i, j, k
-        cdef np.ndarray[np.int_t, ndim=1] child_ptr
+        cdef np.ndarray[np.int64_t, ndim=1] child_ptr
 
         child_ptr = np.zeros(num_grids, dtype='int')
 
