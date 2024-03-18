@@ -84,9 +84,11 @@ jobs:
       shell: bash
       env:
         dependencies: ${{ matrix.dependencies }}
-      run: source ./tests/ci_install.sh
+      run: |
+        pipx install uv
+        source ./tests/ci_install.sh
 
-    - run: python -m pip list
+    - run: uv pip list
     - name: Run Unit Tests (pytest)
       if: matrix.test-runner == 'pytest'
       run: pytest --color=yes
@@ -121,7 +123,7 @@ jobs:
       run: |
         source ./tests/ci_install.sh
 
-    - run: python -m pip list
+    - run: uv pip list
 
     - name: Run Image Tests
       run: |
