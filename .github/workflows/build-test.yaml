@@ -86,6 +86,7 @@ jobs:
         dependencies: ${{ matrix.dependencies }}
       run: |
         pipx install uv
+        uv venv
         source ./tests/ci_install.sh
 
     - run: uv pip list
