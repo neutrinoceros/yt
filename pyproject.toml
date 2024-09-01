@@ -1,7 +1,7 @@
 [build-system]
 # keep in sync with .github/workflows/wheels.yaml
 requires = [
-  "setuptools==73.0.1",
+  "setuptools>=61.2",
   # for the upper pin in Cython
   # see https://github.com/yt-project/yt/issues/4044
   "Cython>=3.0.3, <3.1",
