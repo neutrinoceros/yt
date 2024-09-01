@@ -81,9 +81,6 @@ jobs:
       with:
         submodules: true
 
-    - name: build yt
-      run: pipx run build --wheel
-
     - name: Install dependencies and yt
       shell: bash
       env:
