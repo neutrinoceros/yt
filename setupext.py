@@ -434,7 +434,6 @@ def create_build_ext(lib_exts, cythonize_aliases):
                 compiler_directives={"language_level": 3},
                 nthreads=get_cpu_count(),
             )
-            super().finalize_options()
 
             if self.include_dirs is None:
                 self.include_dirs = include_dirs
@@ -445,6 +444,8 @@ def create_build_ext(lib_exts, cythonize_aliases):
                 self.define = define_macros
             else:
                 self.define.extend(define_macros)
+
+            super().finalize_options()
 
         def build_extensions(self):
             self.check_extensions_list(self.extensions)
