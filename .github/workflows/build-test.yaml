@@ -11,9 +11,6 @@ defaults:
   run:
     shell: bash
 
-env:
-  HOMEBREW_NO_AUTO_UPDATE: 1
-
 jobs:
 
   build:
@@ -115,11 +112,15 @@ jobs:
       run: |
         source .venv/${{matrix.venv-loc}}/activate
         pytest yt --color=yes
+      env:
+        MPLCONFIGDIR: tests
     - name: Run Tests (nose)
       if: matrix.test-runner == 'nose'
       run: |
         source .venv/${{matrix.venv-loc}}/activate
         cat nose_ignores.txt | xargs python -m nose -c nose_unit.cfg --traverse-namespace
+      env:
+        MPLCONFIGDIR: tests
 
   image-tests:
     name: Image tests
@@ -157,6 +158,8 @@ jobs:
                --mpl-results-path=pytest_mpl_results \
                --mpl-baseline-path=tests/pytest_mpl_baseline \
                -rxXs # show extra info on xfailed, xpassed, and skipped tests
+      env:
+        MPLCONFIGDIR: tests
 
     - name: Generate new image baseline
       if: failure()
@@ -164,6 +167,8 @@ jobs:
         pytest yt --color=yes --mpl -m mpl_image_compare \
                --mpl-generate-path=pytest_mpl_new_baseline \
                --last-failed
+      env:
+        MPLCONFIGDIR: tests
 
     # always attempt to upload artifacts, even
     # (and especially) in case of failure.
