@@ -966,7 +966,7 @@ class Communicator:
         # If we have a dict of dicts, recurse
         if isinstance(first_value, dict):
             return {
-                deeper_key: self.reduce(
+                deeper_key: self.all_reduce(
                     {key: value[deeper_key] for key, value in data.items()},
                     op=op,
                 )
