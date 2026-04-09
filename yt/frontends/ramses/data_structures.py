@@ -85,7 +85,7 @@ class RAMSESFileSanitizer:
         # This last case is (erroneously ?) marked as unreachable by mypy
         # If/when this bug is fixed upstream, mypy will warn that the unused
         # 'type: ignore' comment can be removed
-        if self.info_fname is None:  # type: ignore [unreachable]
+        if self.info_fname is None:
             raise ValueError(f"Failed to detect info file from '{filename!s}'")
 
     @property
