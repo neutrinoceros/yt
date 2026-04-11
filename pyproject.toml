@@ -481,7 +481,6 @@ show_error_codes = true
 ignore_missing_imports = true
 warn_unused_configs = true
 warn_unused_ignores = true
-warn_unreachable = true
 show_error_context = true
 exclude = "(test_*|lodgeit)"
 
