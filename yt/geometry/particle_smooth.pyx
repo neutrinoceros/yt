@@ -690,7 +690,7 @@ cdef class IDWInterpolationSmooth(ParticleSmoothOperation):
                       np.float64_t **index_fields, DistanceQueue dq):
         # We have our i, j, k for our cell, as well as the cell position.
         # We also have a list of neighboring particles with particle numbers.
-        cdef np.int64_t pn, ni, di
+        cdef np.int64_t pn, ni
         cdef np.float64_t total_weight = 0.0, total_value = 0.0, r2, val, w
         # We're going to do a very simple IDW average
         if dq.neighbors[0].r2 == 0.0:
@@ -699,9 +699,7 @@ cdef class IDWInterpolationSmooth(ParticleSmoothOperation):
         for ni in range(dq.curn):
             r2 = dq.neighbors[ni].r2
             val = fields[0][dq.neighbors[ni].pn]
-            w = r2
-            for di in range(self.p2 - 1):
-                w *= r2
+            w = r2**self.p2
             total_value += w * val
             total_weight += w
         self.fp[gind(i,j,k,dim) + offset] = total_value / total_weight
