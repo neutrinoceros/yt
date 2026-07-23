@@ -17,7 +17,7 @@ authors = [
 ]
 license = "BSD-3-Clause"
 license-files = [
-    "COPYING.txt",
+    "COPYING",
     "yt/frontends/artio/artio_headers/LICENSE",
 ]
 classifiers = [
