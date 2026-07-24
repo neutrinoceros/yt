@@ -217,7 +217,7 @@ def fill_hydro(FortranFile f,
 
     jump_len = 0
     j = 0
-    for i, field in enumerate(all_fields):
+    for field in all_fields:
         if field in fields:
             jumps[j] = jump_len
             j += 1

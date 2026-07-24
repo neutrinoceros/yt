@@ -648,9 +648,9 @@ cdef class OctreeContainer:
         return cont.n_assigned - initial + nb
 
     def allocate_domains(self, domain_counts):
-        cdef int count, i
+        cdef int count
         self.num_domains = len(domain_counts) # 1-indexed
-        for i, count in enumerate(domain_counts):
+        for count in domain_counts:
             self.domains.append(count)
 
     cdef void append_domain(self, np.int64_t domain_count):
